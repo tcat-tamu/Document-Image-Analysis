@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Fast Sauvola Implementation
+Bundle-SymbolicName: edu.tamu.tcat.dia.binarization.sauvola;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Texas A&M Engineering Experiment Station
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: edu.tamu.tcat.analytics.datatrax,
+ edu.tamu.tcat.analytics.image.binary,
+ edu.tamu.tcat.dia.binarization
+Export-Package: edu.tamu.tcat.dia.binarization.sauvola

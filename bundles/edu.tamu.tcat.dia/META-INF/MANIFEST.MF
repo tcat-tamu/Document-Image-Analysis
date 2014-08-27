@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Document Image Analysis API
+Bundle-SymbolicName: edu.tamu.tcat.dia
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Texas A&M Engineering Experiment Station
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: edu.tamu.tcat.analytics.image.binary,
+ edu.tamu.tcat.analytics.image.region,
+ edu.tamu.tcat.dia,
+ edu.tamu.tcat.dia.binarization,
+ edu.tamu.tcat.dia.segmentation.cc

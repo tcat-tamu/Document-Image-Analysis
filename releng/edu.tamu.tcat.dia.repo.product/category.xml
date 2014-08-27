@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/edu.tamu.tcat.dia.sdk.feature_1.0.0.qualifier.jar" id="edu.tamu.tcat.dia.sdk.feature" version="1.0.0.qualifier">
+      <category name="edu.tamu.tcat.dia"/>
+   </feature>
+   <feature url="features/edu.tamu.tcat.dia.modules.feature_1.0.0.qualifier.jar" id="edu.tamu.tcat.dia.modules.feature" version="1.0.0.qualifier">
+      <category name="edu.tamu.tcat.dia.modules"/>
+   </feature>
+   <category-def name="edu.tamu.tcat.dia" label="Document Image Analysis">
+      <description>
+         SDK for the TCAT Document Imanage Analysis framework. This framework supports the development of reusable image analysis modules such as binarization, segmentation, and classifications for working with images of historical and modern documents. This framework is designed to support both research and rapid application development.
+      </description>
+   </category-def>
+   <category-def name="edu.tamu.tcat.dia.modules" label="TCAT DIA Modules">
+      <description>
+         Implementations of specific document image analysis modules.
+      </description>
+   </category-def>
+</site>
