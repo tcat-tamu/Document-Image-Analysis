@@ -28,23 +28,20 @@ public class FastSauvolaFactory implements TransformerFactory<IntegralImage, Bin
       this.windowSize = windowSize;
    }
    
+   public int getWindowSize()
+   {
+      return windowSize;
+      
+   }
+   
+   public double getK()
+   {
+      return k;
+   }
+
    public void setK(double k)
    {
       this.k = k;
-   }
-   
-   @Override
-   public void configure(Map<String, Object> config) throws InvalidTransformerConfiguration
-   {
-      if (hasValue(config, PARAM_K))
-      {
-         this.k = getValue(config, PARAM_K, Double.class).doubleValue();
-      }
-      
-      if (config.containsKey(PARAM_WINDOW_SIZE))
-      {
-         this.windowSize = getValue(config, PARAM_WINDOW_SIZE, Integer.class).intValue();
-      }
    }
    
    private boolean hasValue(Map<String, Object> config, String key)
@@ -69,6 +66,32 @@ public class FastSauvolaFactory implements TransformerFactory<IntegralImage, Bin
       }
    }
 
+   @Override
+   public Class<IntegralImage> getSourceType()
+   {
+      return IntegralImage.class;
+   }
+   
+   @Override
+   public Class<BinaryImage> getOutputType()
+   {
+      return BinaryImage.class;
+   }
+   
+   @Override
+   public void configure(Map<String, Object> config) throws InvalidTransformerConfiguration
+   {
+      if (hasValue(config, PARAM_K))
+      {
+         this.k = getValue(config, PARAM_K, Double.class).doubleValue();
+      }
+      
+      if (config.containsKey(PARAM_WINDOW_SIZE))
+      {
+         this.windowSize = getValue(config, PARAM_WINDOW_SIZE, Integer.class).intValue();
+      }
+   }
+   
    @Override
    public Map<String, Object> getConfiguration()
    {
