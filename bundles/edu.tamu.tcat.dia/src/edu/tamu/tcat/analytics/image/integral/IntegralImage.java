@@ -1,4 +1,4 @@
-package edu.tamu.tcat.analytics.image.binary;
+package edu.tamu.tcat.analytics.image.integral;
 
 /**
  * Defines a convenient, fast data structure for performing certain computations on a grayscale 

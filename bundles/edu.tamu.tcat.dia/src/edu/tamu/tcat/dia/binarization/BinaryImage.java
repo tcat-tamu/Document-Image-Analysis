@@ -1,4 +1,4 @@
-package edu.tamu.tcat.analytics.image.binary;
+package edu.tamu.tcat.dia.binarization;
 
 public interface BinaryImage
 {

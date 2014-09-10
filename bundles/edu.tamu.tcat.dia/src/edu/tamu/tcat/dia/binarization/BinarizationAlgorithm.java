@@ -1,6 +1,5 @@
 package edu.tamu.tcat.dia.binarization;
 
-import edu.tamu.tcat.analytics.image.binary.BinaryImage;
 
 /**
  * Converts an image into a pure black and white representation of that image. This is 

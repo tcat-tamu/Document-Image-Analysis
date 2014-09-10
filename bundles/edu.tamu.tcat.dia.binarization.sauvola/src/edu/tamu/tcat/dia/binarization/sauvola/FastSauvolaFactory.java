@@ -8,8 +8,8 @@ import java.util.function.Supplier;
 
 import edu.tamu.tcat.analytics.datatrax.InvalidTransformerConfiguration;
 import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
-import edu.tamu.tcat.analytics.image.binary.BinaryImage;
-import edu.tamu.tcat.analytics.image.binary.IntegralImage;
+import edu.tamu.tcat.analytics.image.integral.IntegralImage;
+import edu.tamu.tcat.dia.binarization.BinaryImage;
 
 public class FastSauvolaFactory implements TransformerFactory<IntegralImage, BinaryImage>
 {

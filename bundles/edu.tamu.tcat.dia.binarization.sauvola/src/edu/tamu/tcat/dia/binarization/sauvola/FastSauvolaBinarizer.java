@@ -1,8 +1,8 @@
 package edu.tamu.tcat.dia.binarization.sauvola;
 
-import edu.tamu.tcat.analytics.image.binary.BinaryImage;
-import edu.tamu.tcat.analytics.image.binary.BooleanArrayBinaryImage;
-import edu.tamu.tcat.analytics.image.binary.IntegralImage;
+import edu.tamu.tcat.analytics.image.integral.IntegralImage;
+import edu.tamu.tcat.dia.binarization.BinaryImage;
+import edu.tamu.tcat.dia.binarization.BooleanArrayBinaryImage;
 
 public final class FastSauvolaBinarizer
 {

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import edu.tamu.tcat.analytics.image.binary.BinaryImage;
+import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectedComponent;
 import edu.tamu.tcat.visualpage.dataproc.basic.DataProcessingTaskFactory;
 

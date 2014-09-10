@@ -1,5 +1,7 @@
 package edu.tamu.tcat.dia.binarization.sauvola.test;
 
+import static org.junit.Assert.assertEquals;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
@@ -10,16 +12,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Hashtable;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import edu.tamu.tcat.analytics.datatrax.InvalidTransformerConfiguration;
-import edu.tamu.tcat.analytics.image.binary.BinaryImage;
-import edu.tamu.tcat.analytics.image.binary.IntegralImageImpl;
+import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
+import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaFactory;
 
 

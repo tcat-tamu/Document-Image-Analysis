@@ -8,7 +8,7 @@
  *
  * ALL RIGHTS RESERVED.
  */
-package edu.tamu.tcat.analytics.image.binary;
+package edu.tamu.tcat.analytics.image.integral;
 
 import java.awt.image.Raster;
 

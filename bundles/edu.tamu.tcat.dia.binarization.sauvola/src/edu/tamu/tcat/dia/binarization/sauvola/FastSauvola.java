@@ -1,9 +1,9 @@
 package edu.tamu.tcat.dia.binarization.sauvola;
 
-import edu.tamu.tcat.analytics.image.binary.BinaryImage;
-import edu.tamu.tcat.analytics.image.binary.IntegralImage;
+import edu.tamu.tcat.analytics.image.integral.IntegralImage;
 import edu.tamu.tcat.dia.binarization.BinarizationAlgorithm;
 import edu.tamu.tcat.dia.binarization.BinarizationException;
+import edu.tamu.tcat.dia.binarization.BinaryImage;
 
 public class FastSauvola implements BinarizationAlgorithm<IntegralImage>
 {
