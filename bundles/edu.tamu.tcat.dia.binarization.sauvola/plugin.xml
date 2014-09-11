@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="edu.tamu.tcat.analytics.datatrax.transformfactories">
+      <transformer_factory
+            class="edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaFactory"
+            id="datatrax.factories.dia.binarizers.fastsauvola"
+            output_type="edu.tamu.tcat.dia.binarization.BinaryImage"
+            source_type="edu.tamu.tcat.analytics.image.integral.IntegralImage"
+            title="Fast Sauvola Binarization">
+      </transformer_factory>
+   </extension>
+
+</plugin>
