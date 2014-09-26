@@ -6,12 +6,12 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import edu.tamu.tcat.analytics.datatrax.InvalidTransformerConfiguration;
-import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
+import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
+import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.image.integral.IntegralImage;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 
-public class FastSauvolaFactory implements TransformerFactory<IntegralImage, BinaryImage>
+public class FastSauvolaFactory implements Transformer<IntegralImage, BinaryImage>
 {
    private static final String PARAM_K = "k";
    private static final String PARAM_WINDOW_SIZE = "windowSize";
@@ -49,10 +49,10 @@ public class FastSauvolaFactory implements TransformerFactory<IntegralImage, Bin
       return config.containsKey(key) && config.get(key) != null;
    }
 
-   private <X> X getValue(Map<String, Object> config, String key, Class<X> type) throws InvalidTransformerConfiguration
+   private <X> X getValue(Map<String, Object> config, String key, Class<X> type) throws TransformerConfigurationException
    {
       if (!hasValue(config, key))
-         throw new InvalidTransformerConfiguration("No value is defined for key [" + key + "]");
+         throw new TransformerConfigurationException("No value is defined for key [" + key + "]");
       
       try 
       {
@@ -62,7 +62,7 @@ public class FastSauvolaFactory implements TransformerFactory<IntegralImage, Bin
       {
          String template = "Invalid value [{0}] for key [{1}]. Expected instance of [{2}]";
          String msg = MessageFormat.format(template, config.get(key), key, type.getName());
-         throw new InvalidTransformerConfiguration(msg, cce);
+         throw new TransformerConfigurationException(msg, cce);
       }
    }
 
@@ -79,7 +79,7 @@ public class FastSauvolaFactory implements TransformerFactory<IntegralImage, Bin
    }
    
    @Override
-   public void configure(Map<String, Object> config) throws InvalidTransformerConfiguration
+   public void configure(Map<String, Object> config) throws TransformerConfigurationException
    {
       if (hasValue(config, PARAM_K))
       {

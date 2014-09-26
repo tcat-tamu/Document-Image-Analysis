@@ -17,7 +17,7 @@ import javax.imageio.ImageIO;
 
 import org.junit.Test;
 
-import edu.tamu.tcat.analytics.datatrax.InvalidTransformerConfiguration;
+import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaFactory;
@@ -102,7 +102,7 @@ public class TestSauvola
    }
    
    @Test
-   public void testConfiguration() throws InvalidTransformerConfiguration
+   public void testConfiguration() throws TransformerConfigurationException
    {
       FastSauvolaFactory thresholder = new FastSauvolaFactory();
       // supply valid values
@@ -122,7 +122,7 @@ public class TestSauvola
       checkConfig(thresholder, thresholder2);
    }
    
-   public void testConfigurationSerialization() throws InvalidTransformerConfiguration
+   public void testConfigurationSerialization() throws TransformerConfigurationException
    {
       throw new UnsupportedOperationException();
    }
