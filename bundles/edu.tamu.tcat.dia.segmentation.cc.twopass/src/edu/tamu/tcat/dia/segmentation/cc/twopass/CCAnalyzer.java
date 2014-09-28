@@ -22,8 +22,11 @@ import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
  *
  * From https://www.cs.washington.edu/education/courses/576/02au/homework/hw3/ConnectComponent.java
  */
-public class CCAnalyzerFactory implements Transformer<BinaryImage, ConnectComponentSet>
+public class CCAnalyzer implements Transformer<BinaryImage, ConnectComponentSet>
 {
+   
+   public final static String EXTENSION_ID = "tcat.dia.segmentation.cc.twopass"; 
+
    final static int MAX_LABELS = 100_000;
 
    private int maxLables = 100_000;
@@ -57,6 +60,7 @@ public class CCAnalyzerFactory implements Transformer<BinaryImage, ConnectCompon
    public Runnable create(final Supplier<? extends BinaryImage> source, 
                           final Consumer<? super ConnectComponentSet> sink)
    {
+      // TODO make it so that Finder doesn't depend on Transform API.
       return new Finder(source, sink, maxLables);
    }
 

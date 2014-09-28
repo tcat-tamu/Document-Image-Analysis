@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="edu.tamu.tcat.analytics.datatrax.transformfactories">
+      <transformer_factory
+            class="edu.tamu.tcat.dia.segmentation.cc.twopass.CCAnalyzer"
+            id="tcat.dia.segmentation.cc.twopass"
+            output_type="edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet"
+            source_type="edu.tamu.tcat.dia.binarization.BinaryImage"
+            title="Connected Component Finder (Two Pass)">
+      </transformer_factory>
+   </extension>
+
+</plugin>
