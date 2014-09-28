@@ -1,8 +1,6 @@
-package edu.tamu.tcat.dia.segmentation.cc.twopass;
+package edu.tamu.tcat.dia.segmentation.cc;
 
 import java.util.Collection;
-
-import edu.tamu.tcat.dia.segmentation.cc.ConnectedComponent;
 
 public interface ConnectComponentSet
 {

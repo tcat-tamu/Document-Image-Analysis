@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
+import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
 
 /**
  * Use row-by-row labeling algorithm to label connected components
