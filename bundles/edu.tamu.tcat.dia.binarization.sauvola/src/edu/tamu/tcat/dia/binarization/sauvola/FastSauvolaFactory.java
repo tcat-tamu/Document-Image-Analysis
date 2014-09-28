@@ -103,7 +103,7 @@ public class FastSauvolaFactory implements Transformer<IntegralImage, BinaryImag
    }
 
    @Override
-   public Runnable create(Supplier<IntegralImage> source, Consumer<BinaryImage> sink)
+   public Runnable create(Supplier<? extends IntegralImage> source, Consumer<? super BinaryImage> sink)
    {
       return new Runnable()
       {
