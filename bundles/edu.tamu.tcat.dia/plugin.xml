@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="edu.tamu.tcat.analytics.datatrax.transformfactories">
+      <transformer_factory
+            class="edu.tamu.tcat.analytics.image.integral.datatrax.BufferedImageAdapter"
+            id="tcat.dia.images.adapters.buffered.integral"
+            output_type="edu.tamu.tcat.analytics.image.integral.IntegralImage"
+            source_type="java.awt.image.BufferedImage"
+            title="Integral Image Adapter (BufferedImage)">
+      </transformer_factory>
+   </extension>
+
+</plugin>

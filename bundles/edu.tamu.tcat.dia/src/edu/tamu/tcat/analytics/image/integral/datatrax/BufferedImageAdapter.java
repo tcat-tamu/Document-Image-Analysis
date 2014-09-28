@@ -1,6 +1,7 @@
 package edu.tamu.tcat.analytics.image.integral.datatrax;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -12,10 +13,12 @@ import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.image.integral.IntegralImage;
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 
-public class BufferedImageAdapterFactory implements Transformer<BufferedImage, IntegralImage>
+public class BufferedImageAdapter implements Transformer<BufferedImage, IntegralImage>
 {
+   
+   public final static String EXTENSION_ID = "tcat.dia.images.adapters.buffered.integral"; 
 
-   public BufferedImageAdapterFactory()
+   public BufferedImageAdapter()
    {
    }
 
@@ -42,6 +45,19 @@ public class BufferedImageAdapterFactory implements Transformer<BufferedImage, I
    {
       return new HashMap<>();
    }
+   
+   public IntegralImage adapt(BufferedImage image)
+   {
+      Objects.requireNonNull(image, "Source image was null");
+      
+      Raster data = image.getData();
+      if (data.getNumBands() > 1)
+      {
+         // TODO convert to grayscale.
+      }
+      
+      return IntegralImageImpl.create(data);
+   }
 
    @Override
    public Runnable create(Supplier<? extends BufferedImage> source, Consumer<? super IntegralImage> sink)
@@ -53,15 +69,7 @@ public class BufferedImageAdapterFactory implements Transformer<BufferedImage, I
          public void run()
          {
             BufferedImage src = source.get();
-            Objects.requireNonNull(src, "Source image was null");
-            
-            if (src.getData().getNumBands() > 1)
-            {
-               // TODO convert to grayscale.
-            }
-            
-            
-            sink.accept(IntegralImageImpl.create(src.getData()));
+            sink.accept(adapt(src));
          }
       };
    }
