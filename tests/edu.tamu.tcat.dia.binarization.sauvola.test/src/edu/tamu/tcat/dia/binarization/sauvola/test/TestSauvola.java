@@ -20,7 +20,7 @@ import org.junit.Test;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
-import edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaFactory;
+import edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaTransformer;
 
 
 public class TestSauvola
@@ -62,7 +62,7 @@ public class TestSauvola
    {
       Path dataDir = Paths.get("C:\\dev\\git\\citd.dia\\tests\\edu.tamu.tcat.dia.binarization.sauvola.test\\res");
       
-      FastSauvolaFactory thresholder = new FastSauvolaFactory();
+      FastSauvolaTransformer thresholder = new FastSauvolaTransformer();
       thresholder.setK(0.3);
       Path imagePath = dataDir.resolve("shipbuilding-treatise.jpg");
       Path outputPath = dataDir.resolve("output/shipbuilding-treatise.png");
@@ -89,13 +89,13 @@ public class TestSauvola
       runnable.run();
    }
    
-   private void checkConfig(FastSauvolaFactory thresholder, double k, int window)
+   private void checkConfig(FastSauvolaTransformer thresholder, double k, int window)
    {
       assertEquals("Values for K do not match", k, thresholder.getK(), 0.00001);
       assertEquals("Values for window size do not match", window, thresholder.getWindowSize());
    }
    
-   private void checkConfig(FastSauvolaFactory expected, FastSauvolaFactory actual)
+   private void checkConfig(FastSauvolaTransformer expected, FastSauvolaTransformer actual)
    {
       assertEquals("Values for K do not match", expected.getK(), actual.getK(), 0.00001);
       assertEquals("Values for window size do not match", expected.getWindowSize(), actual.getWindowSize());
@@ -104,7 +104,7 @@ public class TestSauvola
    @Test
    public void testConfiguration() throws TransformerConfigurationException
    {
-      FastSauvolaFactory thresholder = new FastSauvolaFactory();
+      FastSauvolaTransformer thresholder = new FastSauvolaTransformer();
       // supply valid values
       double k = 0.3;
       int window = 6;
@@ -116,7 +116,7 @@ public class TestSauvola
       // TODO supply invalid values
       
       // TODO test configuration
-      FastSauvolaFactory thresholder2 = new FastSauvolaFactory();
+      FastSauvolaTransformer thresholder2 = new FastSauvolaTransformer();
       thresholder2.configure(thresholder.getConfiguration());
    
       checkConfig(thresholder, thresholder2);
