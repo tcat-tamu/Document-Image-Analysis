@@ -1,12 +1,14 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Two Pass Connected Component Segmentation
-Bundle-SymbolicName: edu.tamu.tcat.dia.segmentation.cc.twopass
+Bundle-SymbolicName: edu.tamu.tcat.dia.segmentation.cc.twopass;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Texas A&M Engineering Experiment Station
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: edu.tamu.tcat.analytics.datatrax,
+ edu.tamu.tcat.analytics.datatrax.basic.factorymeta,
  edu.tamu.tcat.analytics.image.integral,
  edu.tamu.tcat.analytics.image.region,
  edu.tamu.tcat.dia.binarization,
  edu.tamu.tcat.dia.segmentation.cc
+Export-Package: edu.tamu.tcat.dia.segmentation.cc.twopass

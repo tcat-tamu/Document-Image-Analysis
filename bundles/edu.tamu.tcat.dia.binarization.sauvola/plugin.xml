@@ -4,8 +4,8 @@
    <extension
          point="edu.tamu.tcat.analytics.datatrax.transformfactories">
       <transformer_factory
-            class="edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaFactory"
-            id="datatrax.factories.dia.binarizers.fastsauvola"
+            class="edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaTransformer"
+            id="tcat.dia.binarizers.fastsauvola"
             output_type="edu.tamu.tcat.dia.binarization.BinaryImage"
             source_type="edu.tamu.tcat.analytics.image.integral.IntegralImage"
             title="Fast Sauvola Binarization">

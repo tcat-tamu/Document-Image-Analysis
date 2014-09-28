@@ -11,15 +11,24 @@ import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.image.integral.IntegralImage;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 
-public class FastSauvolaFactory implements Transformer<IntegralImage, BinaryImage>
+/**
+ * Performs binarization of an source image using Sauvola's method. This implementation based an
+ * optimized variant of the original algorithm that relies on integral images.
+ * 
+ * <p>
+ * TODO add citations for relevant papers
+ */
+public class FastSauvolaTransformer implements Transformer<IntegralImage, BinaryImage>
 {
+   public static final String EXTENSION_ID = "tcat.dia.binarizers.fastsauvola";
+   
    private static final String PARAM_K = "k";
    private static final String PARAM_WINDOW_SIZE = "windowSize";
    
    private int windowSize = 0;
    private double k = 0.5;
    
-   public FastSauvolaFactory()
+   public FastSauvolaTransformer()
    {
    }
 
