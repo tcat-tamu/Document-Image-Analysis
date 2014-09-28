@@ -5,8 +5,8 @@ Bundle-SymbolicName: edu.tamu.tcat.dia.segmentation.cc.twopass
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Texas A&M Engineering Experiment Station
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Import-Package: edu.tamu.tcat.analytics.image.integral,
+Import-Package: edu.tamu.tcat.analytics.datatrax,
+ edu.tamu.tcat.analytics.image.integral,
  edu.tamu.tcat.analytics.image.region,
  edu.tamu.tcat.dia.binarization,
- edu.tamu.tcat.dia.segmentation.cc,
- edu.tamu.tcat.visualpage.dataproc.basic
+ edu.tamu.tcat.dia.segmentation.cc
