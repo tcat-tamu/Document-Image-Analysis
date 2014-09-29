@@ -1,8 +1,7 @@
 package edu.tamu.tcat.dia.segmentation.cc.twopass;
 
-import java.awt.image.WritableRaster;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import edu.tamu.tcat.analytics.image.region.BoundingBox;
@@ -15,21 +14,8 @@ import edu.tamu.tcat.dia.segmentation.cc.ConnectedComponent;
  */
 public class SimpleCC implements ConnectedComponent {
 
-	public static void write(SimpleCC cc, WritableRaster raster, int[] color)
-	{
-		int bands = color.length;
-		for (int[] point : cc.points)
-		{
-			int x = point[0];
-			int y = point[1];
-			for (int b = 0; b < bands; b++) {
-				raster.setSample(x, y, b, color[b]);
-			}
-		}
-	}
-
 	// TODO make this immutable -- create a builder
-	private final List<int[]> points = new ArrayList<>();
+	private final Set<Point> points = new HashSet<>();
 	private int xMin = -1;
 	private int xMax = -1;
 	private int yMin = -1;
@@ -48,8 +34,7 @@ public class SimpleCC implements ConnectedComponent {
    @Override
    public Set<Point> getPoints()
    {
-      // TODO Auto-generated method stub
-      return null;
+      return Collections.unmodifiableSet(points);
    }
 
    @Override
@@ -75,11 +60,36 @@ public class SimpleCC implements ConnectedComponent {
 		if (yMax < 0 || yMax < y)
 			yMax = y;
 
-		points.add(new int[] {x, y});
+		points.add(new PointImpl(x, y));
 	}
 	
 	void setSequence(int i)
 	{
 	   this.sequence = i;
+	}
+	
+	private static class PointImpl implements Point 
+	{
+	   private final int y;
+      private final int x;
+
+      public PointImpl(int x, int y)
+      {
+         this.x = x;
+         this.y = y;
+      }
+      
+      @Override
+      public int getX()
+      {
+         return x;
+      }
+
+      @Override
+      public int getY()
+      {
+         return y;
+      }
+	   
 	}
 }
