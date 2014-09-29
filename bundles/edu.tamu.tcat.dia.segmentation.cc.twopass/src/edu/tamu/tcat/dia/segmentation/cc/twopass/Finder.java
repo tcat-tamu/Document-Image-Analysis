@@ -65,14 +65,15 @@ public class Finder implements Runnable
             boolean connectedLeft = (x > 0 && image.isForeground(ix - 1));
             boolean connectedUp =  (y > 0 && image.isForeground(prexIx));
 
+            // HACK seems like these first two if statements are overwritten by the third
             if (connectedLeft) 
                k = result[ix - 1];
 
             if (connectedUp && (!connectedLeft || result[prexIx] < k )) 
                k = result[prexIx];
 
-            if (connectedLeft || connectedUp)
-               k = uf.increment();
+            if (!connectedLeft && !connectedUp)
+               k = uf.makeSet();
 
             if (k >= maxLabels)
                throw new IllegalStateException("maximum number of labels reached. increase MAX_LABELS and recompile.");
@@ -121,7 +122,7 @@ public class Finder implements Runnable
          offset += w;
       }
    
-      SimpleCCSet ccSet = new SimpleCCSet(components);
+      SimpleCCSet ccSet = new SimpleCCSet(w, h, components);
       return ccSet;
    }
 }
