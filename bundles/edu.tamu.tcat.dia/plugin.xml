@@ -10,6 +10,13 @@
             source_type="java.awt.image.BufferedImage"
             title="Integral Image Adapter (BufferedImage)">
       </transformer_factory>
+      <transformer_factory
+            class="edu.tamu.tcat.dia.binarization.datatrax.BinaryImageWriter"
+            id="tcat.dia.images.adapters.binary.writer"
+            output_type="edu.tamu.tcat.dia.binarization.BinaryImage"
+            source_type="edu.tamu.tcat.dia.binarization.BinaryImage"
+            title="Binary Image Writer">
+      </transformer_factory>
    </extension>
 
 </plugin>
