@@ -10,6 +10,13 @@
             source_type="edu.tamu.tcat.dia.binarization.BinaryImage"
             title="Connected Component Finder (Two Pass)">
       </transformer_factory>
+      <transformer_factory
+            class="edu.tamu.tcat.dia.segmentation.cc.twopass.CCWriter"
+            id="tcat.dia.seg.adapters.cc.writer"
+            output_type="edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet"
+            source_type="edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet"
+            title="Colorized CC Writer">
+      </transformer_factory>
    </extension>
 
 </plugin>
