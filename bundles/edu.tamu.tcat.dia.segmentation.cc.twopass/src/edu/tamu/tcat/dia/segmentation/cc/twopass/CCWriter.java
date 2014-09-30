@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
 
-import edu.tamu.tcat.analytics.datatrax.Transformer;
+import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.analytics.image.region.BoundingBox;
 import edu.tamu.tcat.analytics.image.region.Point;
@@ -25,7 +25,7 @@ import edu.tamu.tcat.dia.datatrax.ImageWriterUtils;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectedComponent;
 
-public class CCWriter implements Transformer<ConnectComponentSet, ConnectComponentSet>
+public class CCWriter implements TransformerFactory<ConnectComponentSet, ConnectComponentSet>
 {
 
    public static final String EXTENSION_ID = "tcat.dia.seg.adapters.cc.writer";

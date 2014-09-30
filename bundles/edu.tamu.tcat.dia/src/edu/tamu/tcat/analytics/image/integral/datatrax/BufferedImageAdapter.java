@@ -9,11 +9,11 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
-import edu.tamu.tcat.analytics.datatrax.Transformer;
+import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
 import edu.tamu.tcat.analytics.image.integral.IntegralImage;
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 
-public class BufferedImageAdapter implements Transformer<BufferedImage, IntegralImage>
+public class BufferedImageAdapter implements TransformerFactory<BufferedImage, IntegralImage>
 {
    
    public final static String EXTENSION_ID = "tcat.dia.images.adapters.buffered.integral"; 

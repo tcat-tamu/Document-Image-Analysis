@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
-import edu.tamu.tcat.analytics.datatrax.Transformer;
+import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
 import edu.tamu.tcat.analytics.image.integral.IntegralImage;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 
@@ -18,7 +18,7 @@ import edu.tamu.tcat.dia.binarization.BinaryImage;
  * <p>
  * TODO add citations for relevant papers
  */
-public class FastSauvolaTransformer implements Transformer<IntegralImage, BinaryImage>
+public class FastSauvolaTransformer implements TransformerFactory<IntegralImage, BinaryImage>
 {
    public static final String EXTENSION_ID = "tcat.dia.binarizers.fastsauvola";
    

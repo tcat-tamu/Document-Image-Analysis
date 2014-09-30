@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import edu.tamu.tcat.analytics.datatrax.Transformer;
+import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.datatrax.ImageWriterUtils;
@@ -17,7 +17,7 @@ import edu.tamu.tcat.dia.datatrax.ImageWriterUtils;
  * Pass through data transformer that writes {@link BinaryImage}s to a file while passing 
  * the input image unchanged to the provided sink. 
  */
-public class BinaryImageWriter implements Transformer<BinaryImage, BinaryImage>
+public class BinaryImageWriter implements TransformerFactory<BinaryImage, BinaryImage>
 {
    public static final String EXTENSION_ID = "tcat.dia.images.adapters.binary.writer";
 
