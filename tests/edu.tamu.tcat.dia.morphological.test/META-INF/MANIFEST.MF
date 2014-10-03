@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Unit Tests for Morphologic Ops
+Bundle-SymbolicName: edu.tamu.tcat.dia.morphological.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: edu.tamu.tcat.analytics.image.integral,
+ edu.tamu.tcat.dia.binarization,
+ edu.tamu.tcat.dia.binarization.sauvola,
+ org.junit
+Bundle-ClassPath: lib/jai_imageio.jar,
+ .
