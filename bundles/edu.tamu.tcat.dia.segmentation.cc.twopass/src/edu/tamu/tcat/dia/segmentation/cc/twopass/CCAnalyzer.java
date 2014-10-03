@@ -2,11 +2,11 @@ package edu.tamu.tcat.dia.segmentation.cc.twopass;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
-import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
+import edu.tamu.tcat.analytics.datatrax.DataSink;
+import edu.tamu.tcat.analytics.datatrax.DataSource;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
+import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
 
@@ -22,7 +22,7 @@ import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
  *
  * From https://www.cs.washington.edu/education/courses/576/02au/homework/hw3/ConnectComponent.java
  */
-public class CCAnalyzer implements TransformerFactory<BinaryImage, ConnectComponentSet>
+public class CCAnalyzer implements TransformerFactory
 {
    
    public final static String EXTENSION_ID = "tcat.dia.segmentation.cc.twopass"; 
@@ -56,9 +56,9 @@ public class CCAnalyzer implements TransformerFactory<BinaryImage, ConnectCompon
       return new HashMap<String, Object>();
    }
 
+   @SuppressWarnings({ "rawtypes", "unchecked" })
    @Override
-   public Runnable create(final Supplier<? extends BinaryImage> source, 
-                          final Consumer<? super ConnectComponentSet> sink)
+   public Runnable create(DataSource source, DataSink sink)
    {
       // TODO make it so that Finder doesn't depend on Transform API.
       return new Finder(source, sink, maxLables);

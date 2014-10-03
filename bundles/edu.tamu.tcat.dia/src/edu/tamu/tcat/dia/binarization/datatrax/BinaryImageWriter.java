@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
-import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
+import edu.tamu.tcat.analytics.datatrax.DataSink;
+import edu.tamu.tcat.analytics.datatrax.DataSource;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
+import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.datatrax.ImageWriterUtils;
 
@@ -17,7 +17,7 @@ import edu.tamu.tcat.dia.datatrax.ImageWriterUtils;
  * Pass through data transformer that writes {@link BinaryImage}s to a file while passing 
  * the input image unchanged to the provided sink. 
  */
-public class BinaryImageWriter implements TransformerFactory<BinaryImage, BinaryImage>
+public class BinaryImageWriter implements TransformerFactory
 {
    public static final String EXTENSION_ID = "tcat.dia.images.adapters.binary.writer";
 
@@ -83,17 +83,19 @@ public class BinaryImageWriter implements TransformerFactory<BinaryImage, Binary
       return config;
    }
 
+   @SuppressWarnings("rawtypes")
    @Override
-   public Runnable create(Supplier<? extends BinaryImage> source, Consumer<? super BinaryImage> sink)
+   public Runnable create(DataSource source, DataSink sink)
    {
       return new Runnable() {
          
+         @SuppressWarnings("unchecked")
          @Override
          public void run()
          {
             try 
             {
-               BinaryImage image = source.get();
+               BinaryImage image = (BinaryImage)source.get();
                ImageWriterUtils.writeImage(image, path, format, model);
                sink.accept(image);
             }

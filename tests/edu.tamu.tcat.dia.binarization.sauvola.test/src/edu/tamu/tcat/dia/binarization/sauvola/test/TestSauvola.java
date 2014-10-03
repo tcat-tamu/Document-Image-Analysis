@@ -75,7 +75,7 @@ public class TestSauvola
          {
             try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
             {
-               ImageIO.write(toImage(im, image), "png", out);
+               ImageIO.write(toImage((BinaryImage)im, image), "png", out);
                out.flush();
             }
          }

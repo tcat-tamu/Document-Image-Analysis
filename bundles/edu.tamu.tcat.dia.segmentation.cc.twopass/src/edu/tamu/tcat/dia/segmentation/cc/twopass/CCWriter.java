@@ -12,20 +12,20 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
 
-import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
+import edu.tamu.tcat.analytics.datatrax.DataSink;
+import edu.tamu.tcat.analytics.datatrax.DataSource;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
+import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
 import edu.tamu.tcat.analytics.image.region.BoundingBox;
 import edu.tamu.tcat.analytics.image.region.Point;
 import edu.tamu.tcat.dia.datatrax.ImageWriterUtils;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectedComponent;
 
-public class CCWriter implements TransformerFactory<ConnectComponentSet, ConnectComponentSet>
+public class CCWriter implements TransformerFactory
 {
 
    public static final String EXTENSION_ID = "tcat.dia.seg.adapters.cc.writer";
@@ -130,16 +130,18 @@ public class CCWriter implements TransformerFactory<ConnectComponentSet, Connect
       return config;
    }
 
+   @SuppressWarnings("rawtypes")
    @Override
-   public Runnable create(Supplier<? extends ConnectComponentSet> source, Consumer<? super ConnectComponentSet> sink)
+   public Runnable create(DataSource source, DataSink sink)
    {
       return new Runnable()
       {
          
+         @SuppressWarnings("unchecked")
          @Override
          public void run()
          {
-            ConnectComponentSet components = source.get();
+            ConnectComponentSet components = (ConnectComponentSet)source.get();
             try (OutputStream out = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
             {
                BufferedImage image = render(components, ImageWriterUtils.restoreModel(model), colorMap);

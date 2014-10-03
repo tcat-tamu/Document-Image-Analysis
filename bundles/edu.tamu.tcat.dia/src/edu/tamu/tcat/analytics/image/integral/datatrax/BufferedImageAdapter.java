@@ -5,15 +5,15 @@ import java.awt.image.Raster;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
+import edu.tamu.tcat.analytics.datatrax.DataSink;
+import edu.tamu.tcat.analytics.datatrax.DataSource;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
 import edu.tamu.tcat.analytics.image.integral.IntegralImage;
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 
-public class BufferedImageAdapter implements TransformerFactory<BufferedImage, IntegralImage>
+public class BufferedImageAdapter implements TransformerFactory
 {
    
    public final static String EXTENSION_ID = "tcat.dia.images.adapters.buffered.integral"; 
@@ -59,16 +59,18 @@ public class BufferedImageAdapter implements TransformerFactory<BufferedImage, I
       return IntegralImageImpl.create(data);
    }
 
+   @SuppressWarnings("rawtypes")
    @Override
-   public Runnable create(Supplier<? extends BufferedImage> source, Consumer<? super IntegralImage> sink)
+   public Runnable create(DataSource source, DataSink sink)
    {
       return new Runnable()
       {
          
+         @SuppressWarnings("unchecked")
          @Override
          public void run()
          {
-            BufferedImage src = source.get();
+            BufferedImage src = (BufferedImage)source.get();
             sink.accept(adapt(src));
          }
       };

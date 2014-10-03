@@ -3,9 +3,9 @@ package edu.tamu.tcat.dia.binarization.sauvola;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
+import edu.tamu.tcat.analytics.datatrax.DataSink;
+import edu.tamu.tcat.analytics.datatrax.DataSource;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
 import edu.tamu.tcat.analytics.image.integral.IntegralImage;
@@ -18,7 +18,7 @@ import edu.tamu.tcat.dia.binarization.BinaryImage;
  * <p>
  * TODO add citations for relevant papers
  */
-public class FastSauvolaTransformer implements TransformerFactory<IntegralImage, BinaryImage>
+public class FastSauvolaTransformer implements TransformerFactory
 {
    public static final String EXTENSION_ID = "tcat.dia.binarizers.fastsauvola";
    
@@ -111,15 +111,17 @@ public class FastSauvolaTransformer implements TransformerFactory<IntegralImage,
       return config;
    }
 
+   @SuppressWarnings("rawtypes")
    @Override
-   public Runnable create(Supplier<? extends IntegralImage> source, Consumer<? super BinaryImage> sink)
+   public Runnable create(DataSource source, DataSink sink)
    {
       return new Runnable()
       {
+         @SuppressWarnings("unchecked")
          @Override
          public void run()
          {
-            IntegralImage input = source.get();
+            IntegralImage input = (IntegralImage)source.get();
             int window = (windowSize > 0) ? windowSize : input.getWidth() / 15;
                
             FastSauvolaBinarizer binarizer = new FastSauvolaBinarizer(input, window, k);
