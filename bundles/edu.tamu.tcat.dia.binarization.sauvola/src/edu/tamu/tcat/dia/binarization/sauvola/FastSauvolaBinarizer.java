@@ -17,7 +17,7 @@ public final class FastSauvolaBinarizer
    BooleanArrayBinaryImage  output;
    private IntegralImage input;
    
-   FastSauvolaBinarizer(IntegralImage source, int windowSize, double k)
+   public FastSauvolaBinarizer(IntegralImage source, int windowSize, double k)
    {
       this.input = source;
       
