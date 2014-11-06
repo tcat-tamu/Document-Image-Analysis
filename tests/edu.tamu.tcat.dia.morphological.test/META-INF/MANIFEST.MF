@@ -7,6 +7,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: edu.tamu.tcat.analytics.image.integral,
  edu.tamu.tcat.dia.binarization,
  edu.tamu.tcat.dia.binarization.sauvola,
+ edu.tamu.tcat.dia.morphological,
  org.junit
 Bundle-ClassPath: lib/jai_imageio.jar,
  .

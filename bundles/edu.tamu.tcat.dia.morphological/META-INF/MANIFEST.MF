@@ -4,3 +4,11 @@ Bundle-Name: Morphological Operations for Images
 Bundle-SymbolicName: edu.tamu.tcat.dia.morphological
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: edu.tamu.tcat.analytics.image.integral,
+ edu.tamu.tcat.dia.binarization
+Export-Package: edu.tamu.tcat.dia.morphological
+Bundle-ClassPath: lib/opencv-249.jar,
+ .
+Bundle-NativeCode: lib/x64/opencv_java249.dll ; 
+  osname=win64;osname=Win32 ;
+  processor=x86_64
