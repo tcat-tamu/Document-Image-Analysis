@@ -11,8 +11,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.imageio.ImageIO;
@@ -24,9 +28,10 @@ import org.junit.Test;
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaBinarizer;
+import edu.tamu.tcat.dia.morphological.RunLengthRatioGenerator;
 import edu.tamu.tcat.dia.morphological.ThresholdReducer;
 
-public class ThresholdReducerTests
+public class RLGeneratorTest
 {
 
    private BufferedImage image;
@@ -34,7 +39,7 @@ public class ThresholdReducerTests
    private BinaryImage binReducedImage;
    private Path dataDir;
 
-   public ThresholdReducerTests()
+   public RLGeneratorTest()
    {
       // TODO Auto-generated constructor stub
    }
@@ -67,12 +72,12 @@ public class ThresholdReducerTests
    @Before
    public void setup() throws IOException
    {
-      dataDir = Paths.get("C:\\Users\\deepa.narayanan\\git\\citd.dia\\tests\\edu.tamu.tcat.dia.binarization.sauvola.test\\res");
-      Path imagePath = dataDir.resolve("00000009.jp2");
+      dataDir = Paths.get("C:\\Projects\\VisualPage\\");
+      Path imagePath = dataDir.resolve("bach-sonata-1.png");
       if (!Files.exists(imagePath))
          throw new IllegalArgumentException("Source image does not exist [" + imagePath + "]");
 
-      Iterator<ImageReader> imageReadersBySuffix = ImageIO.getImageReadersBySuffix("jp2");
+      Iterator<ImageReader> imageReadersBySuffix = ImageIO.getImageReadersBySuffix("png");
       image = ImageIO.read(Files.newInputStream(imagePath, StandardOpenOption.READ));
       Objects.requireNonNull(image, "Failed to load source image [" + imagePath +"]");
       
@@ -83,25 +88,36 @@ public class ThresholdReducerTests
    }
 
    @Test
-   public void testThresholdReducer() throws IOException
+   public void testRLRatioGenerator() throws IOException
    {
 
-      Path outputPath = dataDir.resolve("output/00000009-bin.png");
+      Path outputPath = dataDir.resolve("bach-sonata-bin.png");
       try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
       {
          ImageIO.write(toImage((BinaryImage)binImage, image), "png", out);
          out.flush();
       }
       
-      ThresholdReducer reducer = new ThresholdReducer(binImage, 4, 1);
-      binReducedImage = reducer.run();
+      Map<Integer, ArrayList<Float>> rlratio; 
+      RunLengthRatioGenerator rlgenerator = new RunLengthRatioGenerator(binImage, 5);
+      rlratio = rlgenerator.run();
+      System.out.println("keys: "+rlratio.keySet());
+      System.out.println("values: "+rlratio.values());
       
-      outputPath = dataDir.resolve("output/00000009-bin-reduced.png");
+      /*for(int i=0;i<rlratio.size();i++){
+    	  
+    	  if(rlratio.get(i) == Collections.EMPTY_LIST)
+    		  System.out.println("RL ratio list "+i+" is empty");
+    	  else
+    		  System.out.println("RL ratio list "+i+": "+rlratio.get(i).toString());
+      }*/
+      
+      /*outputPath = dataDir.resolve("output/00000009-bin-reduced.png");
       try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
       {
          ImageIO.write(toImage((BinaryImage)binReducedImage, image), "png", out);
          out.flush();
-      }
+      }*/
       
       assertTrue("", true);
    }

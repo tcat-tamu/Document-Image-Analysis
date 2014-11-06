@@ -24,17 +24,21 @@ import org.junit.Test;
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaBinarizer;
+import edu.tamu.tcat.dia.morphological.DilationOperator;
+import edu.tamu.tcat.dia.morphological.ErosionOperator;
 import edu.tamu.tcat.dia.morphological.ThresholdReducer;
 
-public class ThresholdReducerTests
+public class DilationTests
 {
 
    private BufferedImage image;
    private BinaryImage binImage;
-   private BinaryImage binReducedImage;
+   private BinaryImage binErodedImage;
+   private BinaryImage binDilatedImage;
    private Path dataDir;
+   private String filename, outFilename, outFilename2;
 
-   public ThresholdReducerTests()
+   public DilationTests()
    {
       // TODO Auto-generated constructor stub
    }
@@ -68,11 +72,14 @@ public class ThresholdReducerTests
    public void setup() throws IOException
    {
       dataDir = Paths.get("C:\\Users\\deepa.narayanan\\git\\citd.dia\\tests\\edu.tamu.tcat.dia.binarization.sauvola.test\\res");
-      Path imagePath = dataDir.resolve("00000009.jp2");
+      Path imagePath = dataDir.resolve("00000009-bin.png");
       if (!Files.exists(imagePath))
          throw new IllegalArgumentException("Source image does not exist [" + imagePath + "]");
-
-      Iterator<ImageReader> imageReadersBySuffix = ImageIO.getImageReadersBySuffix("jp2");
+      filename = imagePath.toString();
+      outFilename = "C:\\Users\\deepa.narayanan\\git\\citd.dia\\tests\\edu.tamu.tcat.dia.binarization.sauvola.test\\res\\00000009-dilated.png";
+      outFilename2 = "C:\\Users\\deepa.narayanan\\git\\citd.dia\\tests\\edu.tamu.tcat.dia.binarization.sauvola.test\\res\\00000009-eroded.png";
+      
+      Iterator<ImageReader> imageReadersBySuffix = ImageIO.getImageReadersBySuffix("png");
       image = ImageIO.read(Files.newInputStream(imagePath, StandardOpenOption.READ));
       Objects.requireNonNull(image, "Failed to load source image [" + imagePath +"]");
       
@@ -80,26 +87,33 @@ public class ThresholdReducerTests
       FastSauvolaBinarizer binarizer = new FastSauvolaBinarizer(iImage, image.getWidth() / 15, 0.3);
       binImage = binarizer.run();
       
+
    }
 
    @Test
-   public void testThresholdReducer() throws IOException
-   {
-
-      Path outputPath = dataDir.resolve("output/00000009-bin.png");
+   public void testDilation() throws IOException
+   {	
+      //DilationOperator dilator = new DilationOperator(filename, outFilename, null,null);
+      
+	  //DilationOperator dilator = new DilationOperator(binImage, null,null);
+      //binDilatedImage = dilator.run();
+      
+      
+      
+      ErosionOperator eroder = new ErosionOperator(binImage, null, null);
+      binErodedImage = eroder.run();
+      
+      /*Path outputPath = dataDir.resolve("output/dilated-image.png");
       try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
       {
-         ImageIO.write(toImage((BinaryImage)binImage, image), "png", out);
+         ImageIO.write(toImage((BinaryImage)binDilatedImage, image), "png", out);
          out.flush();
-      }
+      }*/
       
-      ThresholdReducer reducer = new ThresholdReducer(binImage, 4, 1);
-      binReducedImage = reducer.run();
-      
-      outputPath = dataDir.resolve("output/00000009-bin-reduced.png");
+      Path outputPath = dataDir.resolve("output/00000009-eroded.png");
       try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
       {
-         ImageIO.write(toImage((BinaryImage)binReducedImage, image), "png", out);
+         ImageIO.write(toImage((BinaryImage)binErodedImage, image), "png", out);
          out.flush();
       }
       

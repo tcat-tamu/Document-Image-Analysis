@@ -24,17 +24,20 @@ import org.junit.Test;
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaBinarizer;
+import edu.tamu.tcat.dia.morphological.ExpansionOperator;
 import edu.tamu.tcat.dia.morphological.ThresholdReducer;
 
-public class ThresholdReducerTests
+public class ExpansionTests
 {
 
    private BufferedImage image;
    private BinaryImage binImage;
+   private BinaryImage binExpandedImage;
    private BinaryImage binReducedImage;
    private Path dataDir;
 
-   public ThresholdReducerTests()
+
+   public ExpansionTests()
    {
       // TODO Auto-generated constructor stub
    }
@@ -79,6 +82,7 @@ public class ThresholdReducerTests
       IntegralImageImpl iImage = IntegralImageImpl.create(image.getData());
       FastSauvolaBinarizer binarizer = new FastSauvolaBinarizer(iImage, image.getWidth() / 15, 0.3);
       binImage = binarizer.run();
+      System.out.println("binImage size: "+binImage.getHeight()+","+binImage.getWidth());
       
    }
 
@@ -95,11 +99,23 @@ public class ThresholdReducerTests
       
       ThresholdReducer reducer = new ThresholdReducer(binImage, 4, 1);
       binReducedImage = reducer.run();
+      System.out.println("binReducedImage size: "+binReducedImage.getHeight()+","+binReducedImage.getWidth());
+      
       
       outputPath = dataDir.resolve("output/00000009-bin-reduced.png");
       try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
       {
          ImageIO.write(toImage((BinaryImage)binReducedImage, image), "png", out);
+         out.flush();
+      }
+      
+      ExpansionOperator expander = new ExpansionOperator(binReducedImage, 4);
+      binExpandedImage = expander.run();
+      
+      outputPath = dataDir.resolve("output/00000009-bin-expanded.png");
+      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
+      {
+         ImageIO.write(toImage((BinaryImage)binExpandedImage, image), "png", out);
          out.flush();
       }
       
