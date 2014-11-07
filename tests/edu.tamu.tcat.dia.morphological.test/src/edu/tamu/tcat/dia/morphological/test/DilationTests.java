@@ -95,12 +95,12 @@ public class DilationTests
    {	
       //DilationOperator dilator = new DilationOperator(filename, outFilename, null,null);
       
-	  //DilationOperator dilator = new DilationOperator(binImage, null,null);
-      //binDilatedImage = dilator.run();
+	   DilationOperator dilator = new DilationOperator(binImage, 5);
+      binDilatedImage = dilator.run();
       
       
       
-      ErosionOperator eroder = new ErosionOperator(binImage, null, null);
+      ErosionOperator eroder = new ErosionOperator(binImage, 10);
       binErodedImage = eroder.run();
       
       /*Path outputPath = dataDir.resolve("output/dilated-image.png");
