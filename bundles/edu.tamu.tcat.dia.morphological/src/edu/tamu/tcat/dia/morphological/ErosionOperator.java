@@ -1,159 +1,103 @@
 package edu.tamu.tcat.dia.morphological;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
-import java.util.Hashtable;
-
+import java.util.logging.Logger;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.Point;
 import org.opencv.core.Size;
-import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.BooleanArrayBinaryImage;
 
-public final class ErosionOperator {
+public final class ErosionOperator
+{
 
-	private BinaryImage input;
-	private int width;
-	private int height;
-	private BooleanArrayBinaryImage output;
-	private Mat structuringElement;
-	private Point anchorPoint;
-	private byte[] imageByteArray, outImageByteArray;
-	private String inFile;
-	private String outFile;
-	private int defaultSize = 3;
-	
-	public static BufferedImage toImage(BinaryImage im, BufferedImage model) {
-		int offset = 0;
-		int width = im.getWidth();
-		int height = im.getHeight();
+   // static initializer to load DLL.
+   static
+   {
+      System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+   }
 
-		ColorModel colorModel = model.getColorModel();
-		WritableRaster raster = colorModel.createCompatibleWritableRaster(
-				width, height);
-		int numBands = raster.getNumBands();
-		for (int r = 0; r < height; r++) {
-			for (int c = 0; c < width; c++) {
-				int value = im.isForeground(offset + c) ? 0 : 255;
-				for (int b = 0; b < numBands; b++)
-					raster.setSample(c, r, b, value);
-			}
+   private final static Logger logger = Logger.getLogger("edu.tamu.tcat.dia.morph.erosion");
+   private BinaryImage input;
+   private Mat structuringElement;
+   private int defaultSize = 3;
 
-			offset += width;
-		}
+   public static byte boolToByte(boolean b)
+   {
+      return (byte)(b ? 0 : 1);
+   }
 
-		return new BufferedImage(colorModel, raster, true, new Hashtable<>());
-	}
-	
-	public static byte boolToByte(boolean b) {
-	    return (byte) (b ? 0 : 1);
-	}
-	
-	public static boolean byteToBool(byte b) {
-	    if(b == 0)
-	    	return true;
-	    else
-	    	return false;
-	}
+   public static boolean byteToBool(byte b)
+   {
+      return (b == 0 ? true : false);
+   }
 
-	public ErosionOperator(String filename, String outFilename, Mat structElem, Point anchor) {
-		
-		this.inFile = filename;
-		this.outFile = outFilename;
-		this.structuringElement = structElem;
-		this.anchorPoint = anchor;
-		this.input = null;
-	}
-	
-	public ErosionOperator(String filename, String outFilename,
-			int size, Point anchor) {
+   public ErosionOperator(BinaryImage source)
+   {
+      this.input = source;
+      this.structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(defaultSize, defaultSize));
+   }
 
-		this.inFile = filename;
-		this.outFile = outFilename;
-		this.anchorPoint = anchor;
-		this.input = null;
-		System.out.println("Creating structuring element, rect of size "+size);
-		Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,
-			new Size(size, size));
-		this.structuringElement = element;
+   public ErosionOperator(BinaryImage source, int sz)
+   {
+      this.input = source;
+      structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(sz, sz));
 
-	}
+   }
 
-	public ErosionOperator(BinaryImage source, Mat structElem, Point anchor) {
-		
-		this.input = source;
-		this.width = source.getWidth();
-		this.height = source.getHeight();
-		this.output = new BooleanArrayBinaryImage(width, height);
-		this.structuringElement = structElem;
-		this.anchorPoint = anchor;
-		
-		System.out.println("Source size: height "+height+" width: "+width);
-		System.out.println("Converting binary image to byte array");
-		this.imageByteArray = new byte[input.getSize()];
-		for(int i=0;i<input.getSize();i++){
-			imageByteArray[i] = boolToByte(input.isForeground(i));
-		}
-	}
+   public ErosionOperator(BinaryImage source, Mat structElem)
+   {
+      this.input = source;
+      this.structuringElement = structElem;
+   }
 
-	public BinaryImage run() {
-		
-		Mat sourceImage;
-		
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+   public BinaryImage run()
+   {
+      int h = input.getHeight();
+      int w = input.getWidth();
+      Mat sourceImage = new Mat(h, w, CvType.CV_8U);
+      Mat destination = new Mat(h, w, CvType.CV_8U);
+      try
+      {
+         sourceImage.put(0, 0, toByteArray(input));
+         Imgproc.erode(sourceImage, destination, this.structuringElement);
+         return writeOutput(destination);
+      }
+      finally
+      {
+         sourceImage.release();
+         destination.release();
+      }
 
-		if(input != null){
-			
-			System.out.println("Creating matrix from binary Image");
-			sourceImage = new Mat(input.getHeight(), input.getWidth(), CvType.CV_8U);
-			sourceImage.put(0, 0, imageByteArray);
-			System.out.println("sourceImageMatrix contains "+sourceImage.height()+" rows, "+sourceImage.width()+" cols");			
-			
-			//To test writing sourceImage to file use this
-			//sourceImage.convertTo(sourceImage, CvType.CV_8UC3, 255.0); 
-			//Highgui.imwrite(this.outFile, sourceImage);
-			
-		}
-		else{
-			sourceImage = Highgui.imread(this.inFile);
-		}
-		
-		Mat destination = new Mat(sourceImage.rows(), sourceImage.cols(),
-				sourceImage.type());
-		destination = sourceImage;
+   }
 
-		if(this.structuringElement == null){
-			System.out.println("Creating default structuring element, 3x3 rect");
-			int erosionSize = defaultSize;
-			Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,
-				new Size(erosionSize, erosionSize));
-			this.structuringElement = element;
-		}
-		System.out.println("sourceImage num channels "+sourceImage.channels()+" type "+sourceImage.toString());
-		Imgproc.erode(sourceImage, destination, this.structuringElement);
-		//Highgui.imwrite(this.outFile, destination);
-		
-		if(input != null){
-			System.out.println("Writing to binary array");
-			outImageByteArray = new byte[input.getSize()];	
-			destination.get(0, 0,outImageByteArray);
-			for(int i=0;i<input.getSize();i++){
-				if(outImageByteArray[i] == 0){
-					output.setForeground(i);
-				}
-			}
-		}
-		else
-			Highgui.imwrite(this.outFile, destination);
-		
-		return output;
+   private static byte[] toByteArray(BinaryImage data)
+   {
+      int sz = data.getSize();
+      byte[] imageByteArray = new byte[sz];
+      for (int i = 0; i < sz; i++)
+      {
+         imageByteArray[i] = boolToByte(data.isForeground(i));
+      }
 
-	}
+      return imageByteArray;
+   }
+
+   private BinaryImage writeOutput(Mat destination)
+   {
+      BooleanArrayBinaryImage output = new BooleanArrayBinaryImage(input.getWidth(), input.getHeight());
+      logger.fine("Writing to binary array");
+      byte[] outImageByteArray = new byte[input.getSize()];
+      destination.get(0, 0, outImageByteArray);
+      for (int i = 0; i < input.getSize(); i++)
+      {
+         if (outImageByteArray[i] == 0)
+            output.setForeground(i);
+      }
+
+      return output;
+   }
 
 }
