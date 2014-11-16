@@ -1,15 +1,14 @@
 package edu.tamu.tcat.dia.binarization.datatrax;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
-import edu.tamu.tcat.analytics.datatrax.DataSink;
-import edu.tamu.tcat.analytics.datatrax.DataSource;
+import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
-import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
+import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.datatrax.ImageWriterUtils;
 
@@ -17,8 +16,11 @@ import edu.tamu.tcat.dia.datatrax.ImageWriterUtils;
  * Pass through data transformer that writes {@link BinaryImage}s to a file while passing 
  * the input image unchanged to the provided sink. 
  */
-public class BinaryImageWriter implements TransformerFactory
+@Deprecated
+public class BinaryImageWriter implements Transformer
 {
+   private static final String IMAGE_PIN = "image";
+
    public static final String EXTENSION_ID = "tcat.dia.images.adapters.binary.writer";
 
    private Path path;
@@ -30,18 +32,6 @@ public class BinaryImageWriter implements TransformerFactory
       // TODO Auto-generated constructor stub
    }
 
-   @Override
-   public Class<BinaryImage> getSourceType()
-   {
-      return BinaryImage.class;
-   }
-
-   @Override
-   public Class<BinaryImage> getOutputType()
-   {
-      return BinaryImage.class;
-   }
-   
    public void setPath(Path path) throws TransformerConfigurationException
    {
       this.path = ImageWriterUtils.processOutputImagePath(path);
@@ -83,28 +73,18 @@ public class BinaryImageWriter implements TransformerFactory
       return config;
    }
 
-   @SuppressWarnings("rawtypes")
    @Override
-   public Runnable create(DataSource source, DataSink sink)
+   public Callable<?> create(TransformerContext ctx)
    {
-      return new Runnable() {
-         
-         @SuppressWarnings("unchecked")
+      final BinaryImage image = (BinaryImage)ctx.getValue(IMAGE_PIN);
+      return new Callable<BinaryImage>()
+      {
          @Override
-         public void run()
+         public BinaryImage call() throws Exception
          {
-            try 
-            {
-               BinaryImage image = (BinaryImage)source.get();
-               ImageWriterUtils.writeImage(image, path, format, model);
-               sink.accept(image);
-            }
-            catch (IOException ioe)
-            {
-               throw new IllegalStateException("", ioe);
-            }
+            ImageWriterUtils.writeImage(image, path, format, model);
+            return image;
          }
       };
    }
-
 }

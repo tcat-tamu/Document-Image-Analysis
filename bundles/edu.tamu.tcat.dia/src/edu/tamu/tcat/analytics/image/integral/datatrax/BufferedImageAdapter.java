@@ -1,37 +1,28 @@
 package edu.tamu.tcat.analytics.image.integral.datatrax;
 
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.awt.image.Raster;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 
-import edu.tamu.tcat.analytics.datatrax.DataSink;
-import edu.tamu.tcat.analytics.datatrax.DataSource;
+import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
-import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
+import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.analytics.image.integral.IntegralImage;
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 
-public class BufferedImageAdapter implements TransformerFactory
+public class BufferedImageAdapter implements Transformer
 {
    
    public final static String EXTENSION_ID = "tcat.dia.images.adapters.buffered.integral"; 
+   public final static String IMAGE_PIN = "image"; 
 
    public BufferedImageAdapter()
    {
-   }
-
-   @Override
-   public Class<BufferedImage> getSourceType()
-   {
-      return BufferedImage.class;
-   }
-
-   @Override
-   public Class<IntegralImage> getOutputType()
-   {
-      return IntegralImage.class;
    }
 
    @Override
@@ -53,27 +44,27 @@ public class BufferedImageAdapter implements TransformerFactory
       Raster data = image.getData();
       if (data.getNumBands() > 1)
       {
-         // TODO convert to grayscale.
+         // convert to grayscale.
+         ColorSpace colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
+         ColorConvertOp op = new ColorConvertOp(colorSpace, null);
+         image = op.filter(image, null);
       }
       
       return IntegralImageImpl.create(data);
    }
 
-   @SuppressWarnings("rawtypes")
    @Override
-   public Runnable create(DataSource source, DataSink sink)
+   public Callable<IntegralImage> create(TransformerContext ctx)
    {
-      return new Runnable()
+      final BufferedImage image = (BufferedImage)ctx.getValue("image");
+      return new Callable<IntegralImage>()
       {
-         
-         @SuppressWarnings("unchecked")
+
          @Override
-         public void run()
+         public IntegralImage call() throws Exception
          {
-            BufferedImage src = (BufferedImage)source.get();
-            sink.accept(adapt(src));
+            return adapt(image);
          }
       };
    }
-
 }

@@ -2,21 +2,35 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="edu.tamu.tcat.analytics.datatrax.transformfactories">
-      <transformer_factory
+         point="edu.tamu.tcat.analytics.datatrax.transformer">
+      <transformer
             class="edu.tamu.tcat.analytics.image.integral.datatrax.BufferedImageAdapter"
             id="tcat.dia.images.adapters.buffered.integral"
             output_type="edu.tamu.tcat.analytics.image.integral.IntegralImage"
-            source_type="java.awt.image.BufferedImage"
-            title="Integral Image Adapter (BufferedImage)">
-      </transformer_factory>
-      <transformer_factory
+            title="BufferedImage to Integral Image Adapter">
+         <inputs>
+            <input_pin
+                  description="BufferedImage source data to be converted"
+                  label="image"
+                  required="true"
+                  type="java.awt.image.BufferedImage">
+            </input_pin>
+         </inputs>
+      </transformer>
+      <transformer
             class="edu.tamu.tcat.dia.binarization.datatrax.BinaryImageWriter"
             id="tcat.dia.images.adapters.binary.writer"
             output_type="edu.tamu.tcat.dia.binarization.BinaryImage"
-            source_type="edu.tamu.tcat.dia.binarization.BinaryImage"
             title="Binary Image Writer">
-      </transformer_factory>
+         <inputs>
+            <input_pin
+                  description="The binary image to be written."
+                  label="image"
+                  required="true"
+                  type="edu.tamu.tcat.dia.binarization.BinaryImage">
+            </input_pin>
+         </inputs>
+      </transformer>
    </extension>
 
 </plugin>
