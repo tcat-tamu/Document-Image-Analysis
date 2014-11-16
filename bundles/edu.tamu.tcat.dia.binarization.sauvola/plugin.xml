@@ -2,14 +2,27 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="edu.tamu.tcat.analytics.datatrax.transformfactories">
-      <transformer_factory
+         point="edu.tamu.tcat.analytics.datatrax.transformer">
+      <transformer
             class="edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaTransformer"
             id="tcat.dia.binarizers.fastsauvola"
             output_type="edu.tamu.tcat.dia.binarization.BinaryImage"
-            source_type="edu.tamu.tcat.analytics.image.integral.IntegralImage"
-            title="Fast Sauvola Binarization">
-      </transformer_factory>
+            title="Fast Sauvola Adaptive Thresholder">
+         <inputs>
+            <input_pin
+                  description="The image to be thresholded as an IntegralImage. Either this pin or the buffered_image pin must be provided."
+                  label="integral_image"
+                  required="false"
+                  type="edu.tamu.tcat.analytics.image.integral.IntegralImage">
+            </input_pin>
+            <input_pin
+                  description="The image to be thresholded as a BufferedImage. Either this pin or the buffered_image pin must be provided."
+                  label="buffered_image"
+                  required="false"
+                  type="java.awt.image.BufferedImage">
+            </input_pin>
+         </inputs>
+      </transformer>
    </extension>
 
 </plugin>

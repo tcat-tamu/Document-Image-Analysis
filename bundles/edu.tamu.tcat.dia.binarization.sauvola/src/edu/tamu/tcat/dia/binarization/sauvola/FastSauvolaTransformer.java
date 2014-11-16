@@ -1,14 +1,17 @@
 package edu.tamu.tcat.dia.binarization.sauvola;
 
+import java.awt.BufferCapabilities;
+import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
-import edu.tamu.tcat.analytics.datatrax.DataSink;
-import edu.tamu.tcat.analytics.datatrax.DataSource;
+import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
-import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
+import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.analytics.image.integral.IntegralImage;
+import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 
 /**
@@ -18,8 +21,11 @@ import edu.tamu.tcat.dia.binarization.BinaryImage;
  * <p>
  * TODO add citations for relevant papers
  */
-public class FastSauvolaTransformer implements TransformerFactory
+public class FastSauvolaTransformer implements Transformer
 {
+   private static final String INTEGRAL_IMAGE_PIN = "integral_image";
+   private static final String BUFFERED_IMAGE_PIN = "buffered_image";
+
    public static final String EXTENSION_ID = "tcat.dia.binarizers.fastsauvola";
    
    private static final String PARAM_K = "k";
@@ -76,18 +82,6 @@ public class FastSauvolaTransformer implements TransformerFactory
    }
 
    @Override
-   public Class<IntegralImage> getSourceType()
-   {
-      return IntegralImage.class;
-   }
-   
-   @Override
-   public Class<BinaryImage> getOutputType()
-   {
-      return BinaryImage.class;
-   }
-   
-   @Override
    public void configure(Map<String, Object> config) throws TransformerConfigurationException
    {
       if (hasValue(config, PARAM_K))
@@ -110,25 +104,30 @@ public class FastSauvolaTransformer implements TransformerFactory
 
       return config;
    }
-
-   @SuppressWarnings("rawtypes")
+   
    @Override
-   public Runnable create(DataSource source, DataSink sink)
+   public Callable<BinaryImage> create(TransformerContext ctx)
    {
-      return new Runnable()
+      // TODO Auto-generated method stub
+      final IntegralImage intImage = (IntegralImage)ctx.getValue(INTEGRAL_IMAGE_PIN);
+      final BufferedImage bufImage = (BufferedImage)ctx.getValue(BUFFERED_IMAGE_PIN);
+      
+      if (intImage == null || bufImage == null)
+         throw new IllegalStateException("No input image supplied");
+      
+      return new Callable<BinaryImage>()
       {
-         @SuppressWarnings("unchecked")
          @Override
-         public void run()
+         public BinaryImage call() throws Exception
          {
-            IntegralImage input = (IntegralImage)source.get();
-            int window = (windowSize > 0) ? windowSize : input.getWidth() / 15;
-               
-            FastSauvolaBinarizer binarizer = new FastSauvolaBinarizer(input, window, k);
-            BinaryImage result = binarizer.run();
-            sink.accept(result);
+            IntegralImage image = (intImage != null) 
+                  ? intImage : IntegralImageImpl.create(bufImage.getData());
+            
+            int window = (windowSize > 0) ? windowSize : image.getWidth() / 15;
+            
+            FastSauvolaBinarizer binarizer = new FastSauvolaBinarizer(image, window, k);
+            return binarizer.run();
          }
       };
    }
-
 }
