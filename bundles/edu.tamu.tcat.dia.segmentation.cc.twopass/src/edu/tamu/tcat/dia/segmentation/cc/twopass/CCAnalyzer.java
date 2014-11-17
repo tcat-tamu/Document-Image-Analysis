@@ -2,11 +2,11 @@ package edu.tamu.tcat.dia.segmentation.cc.twopass;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
-import edu.tamu.tcat.analytics.datatrax.DataSink;
-import edu.tamu.tcat.analytics.datatrax.DataSource;
+import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
-import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
+import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
 
@@ -22,27 +22,17 @@ import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
  *
  * From https://www.cs.washington.edu/education/courses/576/02au/homework/hw3/ConnectComponent.java
  */
-public class CCAnalyzer implements TransformerFactory
+public class CCAnalyzer implements Transformer
 {
    
    public final static String EXTENSION_ID = "tcat.dia.segmentation.cc.twopass"; 
+   private static final String BINARY_IMAGE_PIN = "binary_image";
+
 
    final static int MAX_LABELS = 100_000;
 
    private int maxLables = 100_000;
    
-   @Override
-   public Class<BinaryImage> getSourceType()
-   {
-      return BinaryImage.class;
-   }
-
-   @Override
-   public Class<ConnectComponentSet> getOutputType()
-   {
-      return ConnectComponentSet.class;
-   }
-
    @Override
    public void configure(Map<String, Object> data) throws TransformerConfigurationException
    {
@@ -55,14 +45,10 @@ public class CCAnalyzer implements TransformerFactory
    {
       return new HashMap<String, Object>();
    }
-
-   @SuppressWarnings({ "rawtypes", "unchecked" })
+   
    @Override
-   public Runnable create(DataSource source, DataSink sink)
+   public Callable<ConnectComponentSet> create(TransformerContext ctx)
    {
-      // TODO make it so that Finder doesn't depend on Transform API.
-      return new Finder(source, sink, maxLables);
+      return new Finder((BinaryImage)ctx.getValue(BINARY_IMAGE_PIN), maxLables);
    }
-
-  
 }

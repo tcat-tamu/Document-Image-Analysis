@@ -2,21 +2,35 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="edu.tamu.tcat.analytics.datatrax.transformfactories">
-      <transformer_factory
+         point="edu.tamu.tcat.analytics.datatrax.transformer">
+      <transformer
             class="edu.tamu.tcat.dia.segmentation.cc.twopass.CCAnalyzer"
             id="tcat.dia.segmentation.cc.twopass"
             output_type="edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet"
-            source_type="edu.tamu.tcat.dia.binarization.BinaryImage"
-            title="Connected Component Finder (Two Pass)">
-      </transformer_factory>
-      <transformer_factory
+            title="Connected Component Analyzer (Two Pass)">
+         <inputs>
+            <input_pin
+                  description="A black and white binary image from which the connected components will be extracted."
+                  label="binary_image"
+                  required="true"
+                  type="edu.tamu.tcat.dia.binarization.BinaryImage">
+            </input_pin>
+         </inputs>
+      </transformer>
+      <transformer
             class="edu.tamu.tcat.dia.segmentation.cc.twopass.CCWriter"
             id="tcat.dia.seg.adapters.cc.writer"
-            output_type="edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet"
-            source_type="edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet"
-            title="Colorized CC Writer">
-      </transformer_factory>
+            output_type="java.awt.image.BufferedImage"
+            title="Connected Components Writer">
+         <inputs>
+            <input_pin
+                  description="The connected components to be written to the output image"
+                  label="connected_components"
+                  required="true"
+                  type="edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet">
+            </input_pin>
+         </inputs>
+      </transformer>
    </extension>
 
 </plugin>

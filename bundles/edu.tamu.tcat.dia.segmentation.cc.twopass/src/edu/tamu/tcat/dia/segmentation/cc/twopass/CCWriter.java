@@ -4,31 +4,28 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 
-import javax.imageio.ImageIO;
-
-import edu.tamu.tcat.analytics.datatrax.DataSink;
-import edu.tamu.tcat.analytics.datatrax.DataSource;
+import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
-import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
+import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.analytics.image.region.BoundingBox;
 import edu.tamu.tcat.analytics.image.region.Point;
 import edu.tamu.tcat.dia.datatrax.ImageWriterUtils;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectedComponent;
 
-public class CCWriter implements TransformerFactory
+public class CCWriter implements Transformer
 {
 
    public static final String EXTENSION_ID = "tcat.dia.seg.adapters.cc.writer";
+   public static final String CONNECTED_COMPONENTS_PIN = "connected_components";
+
 
    private Path path;
    private String format = "jpg";
@@ -56,18 +53,6 @@ public class CCWriter implements TransformerFactory
       // TODO Auto-generated constructor stub
    }
 
-   @Override
-   public Class<ConnectComponentSet> getSourceType()
-   {
-      return ConnectComponentSet.class;
-   }
-
-   @Override
-   public Class<ConnectComponentSet> getOutputType()
-   {
-      return ConnectComponentSet.class;
-   }
-   
    public void setPath(Path path) throws TransformerConfigurationException
    {
       this.path = ImageWriterUtils.processOutputImagePath(path);
@@ -90,7 +75,6 @@ public class CCWriter implements TransformerFactory
       else 
          this.colorMap = colorMap;
    }
-   
 
    @Override
    public void configure(Map<String, Object> data) throws TransformerConfigurationException
@@ -130,30 +114,23 @@ public class CCWriter implements TransformerFactory
       return config;
    }
 
-   @SuppressWarnings("rawtypes")
    @Override
-   public Runnable create(DataSource source, DataSink sink)
+   public Callable<BufferedImage> create(TransformerContext ctx)
    {
-      return new Runnable()
+      final ConnectComponentSet components = (ConnectComponentSet)ctx.getValue(CONNECTED_COMPONENTS_PIN);
+      return new Callable<BufferedImage>()
       {
-         
-         @SuppressWarnings("unchecked")
          @Override
-         public void run()
+         public BufferedImage call()
          {
-            ConnectComponentSet components = (ConnectComponentSet)source.get();
-            try (OutputStream out = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
+            try 
             {
-               BufferedImage image = render(components, ImageWriterUtils.restoreModel(model), colorMap);
-               ImageIO.write(image, format, out);
-               out.flush();
+               return render(components, ImageWriterUtils.restoreModel(model), colorMap);
             }
             catch (IOException e)
             {
                throw new IllegalStateException("Failed to instantiate model image.", e);
             }
-            
-            sink.accept(components);
          }
       };
    }

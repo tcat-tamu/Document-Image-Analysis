@@ -2,16 +2,14 @@ package edu.tamu.tcat.dia.segmentation.cc.twopass;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.concurrent.Callable;
 
 import edu.tamu.tcat.dia.binarization.BinaryImage;
+import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
 
-public class Finder implements Runnable
+public class Finder implements Callable<ConnectComponentSet>
 {
    
-   private final Supplier<? extends BinaryImage> input;
-   private final Consumer<? super SimpleCCSet> sink;
    private final int maxLabels;
    
    private BinaryImage image;
@@ -23,25 +21,21 @@ public class Finder implements Runnable
    private UnionFind uf;
 
 
-   public Finder(Supplier<? extends BinaryImage> input, Consumer<? super SimpleCCSet> sink, int maxLabels) {
-      this.input = input;
-      this.sink = sink;
+   public Finder(BinaryImage image, int maxLabels) {
+      this.image = image;
       this.maxLabels = maxLabels;
-            
    }
    
-   public void run() {
+   public ConnectComponentSet call() {
       initialize();
       firstPass();
       secondPass();
-      SimpleCCSet ccSet = createCCSet();
       
-      sink.accept(ccSet);
+      return createCCSet();
    }
 
    private void initialize()
    {
-      this.image = input.get();
       this.w = image.getWidth();
       this.h = image.getHeight();
    
