@@ -2,37 +2,26 @@ package edu.tamu.tcat.dia.morphological;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
-import edu.tamu.tcat.analytics.datatrax.DataSink;
-import edu.tamu.tcat.analytics.datatrax.DataSource;
+import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
-import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
+import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.BooleanArrayBinaryImage;
 
-public class ThresholdReductionTransformer implements TransformerFactory
+public class ThresholdReductionTransformer implements Transformer
 {
-   private int scaleFactor = 1;
+   public final static String EXTENSION_ID = "tcat.dia.morphological.reduction"; 
+   public static final String BINARY_IMAGE_PIN = "binary_image";
+   
+   private int scaleFactor = 4;
    private int threshold = 1;
-
-   @Override
-   public Class<?> getSourceType()
-   {
-      return BinaryImage.class;
-   }
-
-   @Override
-   public Class<?> getOutputType()
-   {
-      return BinaryImage.class;
-   }
 
    @Override
    public void configure(Map<String, Object> data) throws TransformerConfigurationException
    {
       // HACK need to read from config data
-      scaleFactor = 4;
-      threshold = 1;
    }
 
    @Override
@@ -43,16 +32,17 @@ public class ThresholdReductionTransformer implements TransformerFactory
    }
 
    @Override
-   public Runnable create(DataSource<?> source, DataSink<?> sink)
+   public Callable<BinaryImage> create(TransformerContext ctx)
    {
-      return new Runnable()
+      final BinaryImage source = (BinaryImage)ctx.getValue(BINARY_IMAGE_PIN);
+      
+      return new Callable<BinaryImage>()
       {
-         
          @Override
-         public void run()
+         public BinaryImage call() throws Exception
          {
-            int width = ((BinaryImage)source).getWidth();
-            int height = ((BinaryImage)source).getHeight();
+            int width = source.getWidth();
+            int height = source.getHeight();
 
             if (height % 2 != 0)
                height = height - 1;
@@ -60,13 +50,13 @@ public class ThresholdReductionTransformer implements TransformerFactory
             if (width % 2 != 0)
                width = width - 1;
 
-
+            // FIXME scale factor is configurable, but the inner loop only supports a factor of 4.
             int scaledWidth = (int)(width / Math.sqrt(scaleFactor));
             int scaledHeight = (int)(height / Math.sqrt(scaleFactor));
            
             BooleanArrayBinaryImage output = new BooleanArrayBinaryImage(scaledWidth, scaledHeight);
             
-            int outputRowIx = 0;
+            int outputRowIx = 0;    // FIXME why is this unused?
             int outputColIx = 0;
             int offset = 0;
             for (int rowIx = 0; rowIx < height; rowIx += 2)
@@ -75,33 +65,30 @@ public class ThresholdReductionTransformer implements TransformerFactory
                for (int colIx = 0; colIx < width; colIx += 2)
                {
                   int sumValues = 0;
-                  if (((BinaryImage)source).isForeground(colIx, rowIx))
+                  if (source.isForeground(colIx, rowIx))
                      sumValues += 1;
 
-                  if (((BinaryImage)source).isForeground(colIx, rowIx + 1))
+                  if (source.isForeground(colIx, rowIx + 1))
                      sumValues += 1;
 
-                  if (((BinaryImage)source).isForeground(colIx + 1, rowIx))
+                  if (source.isForeground(colIx + 1, rowIx))
                      sumValues += 1;
 
-                  if (((BinaryImage)source).isForeground(colIx + 1, rowIx + 1))
+                  if (source.isForeground(colIx + 1, rowIx + 1))
                      sumValues += 1;
 
                   if (sumValues >= threshold)
-                  {
                      output.setForeground(offset + outputColIx);
-                  }
                   
                   outputColIx++;
                }
+               
                offset += scaledWidth;
                outputRowIx++;
-
             }
-            ((DataSink)sink).accept((BinaryImage)output);
+            
+            return output;
          }
-         
       };
    }
-
 }

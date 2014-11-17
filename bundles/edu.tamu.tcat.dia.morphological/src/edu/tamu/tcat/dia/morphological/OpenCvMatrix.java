@@ -11,6 +11,8 @@ import org.opencv.core.Mat;
  */
 public class OpenCvMatrix implements Supplier<Mat>, AutoCloseable
 {
+   // FIXME need to ensure that those who use this don't hang onto references to deleted instances.
+   
    private final Mat matrix;
    private boolean closed = false;
    

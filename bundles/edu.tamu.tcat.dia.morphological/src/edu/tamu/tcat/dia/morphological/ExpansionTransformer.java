@@ -2,32 +2,20 @@ package edu.tamu.tcat.dia.morphological;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
-import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
-
-import edu.tamu.tcat.analytics.datatrax.DataSink;
-import edu.tamu.tcat.analytics.datatrax.DataSource;
+import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
-import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
+import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.BooleanArrayBinaryImage;
 
-public class ExpansionTransformer implements TransformerFactory
+public class ExpansionTransformer implements Transformer
 {
 
+   public final static String EXTENSION_ID = "tcat.dia.morphological.expansion"; 
+   public static final String BINARY_IMAGE_PIN = "binary_image";
    private int scaleFactor = 1;
-   @Override
-   public Class<?> getSourceType()
-   {
-      return BinaryImage.class;
-   }
-
-   @Override
-   public Class<?> getOutputType()
-   {
-      return BinaryImage.class;
-   }
 
    @Override
    public void configure(Map<String, Object> data) throws TransformerConfigurationException
@@ -44,53 +32,40 @@ public class ExpansionTransformer implements TransformerFactory
    }
 
    @Override
-   public Runnable create(DataSource<?> source, DataSink<?> sink)
+   public Callable<BinaryImage> create(TransformerContext ctx)
    {
-      return new Runnable()
+      final BinaryImage source = (BinaryImage)ctx.getValue(BINARY_IMAGE_PIN);
+      
+      return new Callable<BinaryImage>()
       {
-         
          @Override
-         public void run()
+         public BinaryImage call() throws Exception
          {
-            int height = ((BinaryImage)source).getHeight();
-            int width = ((BinaryImage)source).getWidth();
+            int height = source.getHeight();
+            int width = source.getWidth();
             int scaledWidth = (int) (width * Math.sqrt(scaleFactor));
             int scaledHeight = (int) (height * Math.sqrt(scaleFactor));
             BooleanArrayBinaryImage output = new BooleanArrayBinaryImage(scaledWidth, scaledHeight);
             
-            int pixelX = 0;
-            int pixelY = 0;
             for (int rowIx = 0; rowIx < height; rowIx++) {
-               
-               for (int colIx = 0; colIx < width; colIx++){
-                  if(((BinaryImage)source).isForeground(colIx, rowIx)){
+               int r = rowIx * 2;
+
+               for (int colIx = 0; colIx < width; colIx++) {
+                  
+                  if (source.isForeground(colIx, rowIx)) {
                      //Set foreground for 4 pixels
-                     pixelX = rowIx*2;
-                     pixelY = colIx*2;
-                     output.setForeground(pixelX*scaledWidth+pixelY);
-                     
-                     pixelX = rowIx*2;
-                     pixelY = colIx*2+1;
-                     output.setForeground(pixelX*scaledWidth+pixelY);
-                     
-                     pixelX = rowIx*2+1;
-                     pixelY = colIx*2; 
-                     output.setForeground(pixelX*scaledWidth+pixelY);
-                     
-                     pixelX = rowIx*2+1;
-                     pixelY = colIx*2+1;  
-                     output.setForeground(pixelX*scaledWidth+pixelY);
+                     int ix = r * scaledWidth + colIx * 2;           // base index
+                     output.setForeground(ix);                       // r, c
+                     output.setForeground(ix + 1);                   // r, c + 1
+                     output.setForeground(ix + scaledWidth);         // r + 1, c
+                     output.setForeground(ix + scaledWidth + 1);     // r + 1, c + 1
                      
                   }
-                  
-                  
                }
-               
-            }            
-            ((DataSink)sink).accept((BinaryImage)output);
+            }
+            
+            return output;
          }
       };
-
    }
-
 }
