@@ -1,37 +1,25 @@
 package edu.tamu.tcat.dia.adapters.opencv;
 
-import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
-import edu.tamu.tcat.analytics.datatrax.DataSink;
-import edu.tamu.tcat.analytics.datatrax.DataSource;
+import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
-import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
-import edu.tamu.tcat.analytics.image.integral.IntegralImage;
+import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.morphological.OpenCvMatrix;
 
-public class BinaryToOpenCvMatrix implements TransformerFactory
+public class BinaryToOpenCvMatrix implements Transformer
 {
+   public final static String EXTENSION_ID = "tcat.dia.adapters.opencv.binary2matrix"; 
+   public static final String BINARY_IMAGE_PIN = "binary_image";
 
    public BinaryToOpenCvMatrix()
    {
-   }
-
-   @Override
-   public Class<BufferedImage> getSourceType()
-   {
-      return BufferedImage.class;
-   }
-
-   @Override
-   public Class<IntegralImage> getOutputType()
-   {
-      return IntegralImage.class;
    }
 
    @Override
@@ -63,19 +51,18 @@ public class BinaryToOpenCvMatrix implements TransformerFactory
    }
    
    @Override
-   public Runnable create(DataSource<?> source, DataSink<?> sink)
+   public Callable<OpenCvMatrix> create(TransformerContext ctx)
    {
-      return new Runnable()
+      final BinaryImage im = (BinaryImage)ctx.getValue(BINARY_IMAGE_PIN);
+      return new Callable<OpenCvMatrix>()
       {
-         
          @Override
-         public void run()
+         public OpenCvMatrix call() throws Exception
          {
-            BinaryImage im = (BinaryImage)source.get();
             Mat matrix = new Mat(im.getHeight(), im.getWidth(), CvType.CV_8U);
             matrix.put(0, 0, toByteArray(im));
             
-            ((DataSink)sink).accept(new OpenCvMatrix(matrix));
+            return new OpenCvMatrix(matrix);
          }
       };
    }

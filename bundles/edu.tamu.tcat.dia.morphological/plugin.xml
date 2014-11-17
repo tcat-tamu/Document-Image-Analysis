@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="edu.tamu.tcat.analytics.datatrax.transformer">
+      <transformer
+            class="edu.tamu.tcat.dia.adapters.opencv.BinaryToOpenCvMatrix"
+            id="tcat.dia.adapters.opencv.binary2matrix"
+            output_type="edu.tamu.tcat.dia.morphological.OpenCvMatrix"
+            title="BinaryImage to OpenCV Matrix Adapter">
+         <inputs>
+            <input_pin
+                  description="The BinaryImage to be adapted into an OpenCVMatrix"
+                  label="binary_image"
+                  required="true"
+                  type="edu.tamu.tcat.dia.binarization.BinaryImage">
+            </input_pin>
+         </inputs>
+      </transformer>
+      <transformer
+            class="edu.tamu.tcat.dia.adapters.opencv.OpenCvMatrixToBinary"
+            id="tcat.dia.adapters.opencv.matrix2binary"
+            output_type="edu.tamu.tcat.dia.binarization.BinaryImage"
+            title="OpenCVMatrix to BinaryImage Adapter">
+         <inputs>
+            <input_pin
+                  description="The OpenCVMatrix to be converted into a BinaryImage"
+                  label="image_matrix"
+                  required="true"
+                  type="edu.tamu.tcat.dia.morphological.OpenCvMatrix">
+            </input_pin>
+         </inputs>
+      </transformer>
+      <transformer
+            class="edu.tamu.tcat.dia.morphological.Transformer9"
+            id="edu.tamu.tcat.dia.morphological.transformer9"
+            title="edu.tamu.tcat.dia.morphological.transformer9">
+         <inputs>
+            <input_pin
+                  label="edu.tamu.tcat.dia.morphological.input_pin12"
+                  required="true"
+                  type="edu.tamu.tcat.dia.morphological.Input_pin12">
+            </input_pin>
+         </inputs>
+      </transformer>
+   </extension>
+
+</plugin>

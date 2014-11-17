@@ -1,38 +1,26 @@
 package edu.tamu.tcat.dia.adapters.opencv;
 
-import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
-import edu.tamu.tcat.analytics.datatrax.DataSink;
-import edu.tamu.tcat.analytics.datatrax.DataSource;
+import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
-import edu.tamu.tcat.analytics.datatrax.TransformerFactory;
-import edu.tamu.tcat.analytics.image.integral.IntegralImage;
+import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.BooleanArrayBinaryImage;
 import edu.tamu.tcat.dia.morphological.OpenCvMatrix;
 
-public class OpenCvMatrixToBinary implements TransformerFactory
+public class OpenCvMatrixToBinary implements Transformer
 {
+
+   public final static String EXTENSION_ID = "tcat.dia.adapters.opencv.matrix2binary"; 
+   public static final String IMAGE_MATRIX_PIN = "image_matrix";
 
    public OpenCvMatrixToBinary()
    {
-   }
-
-   @Override
-   public Class<OpenCvMatrix> getSourceType()
-   {
-      return OpenCvMatrix.class;
-   }
-
-   @Override
-   public Class<BinaryImage> getOutputType()
-   {
-      return BinaryImage.class;
    }
 
    @Override
@@ -47,27 +35,36 @@ public class OpenCvMatrixToBinary implements TransformerFactory
       return new HashMap<>();
    }
    
-   @Override
-   public Runnable create(DataSource<?> source, DataSink<?> sink)
+   private BinaryImage adapt(Mat srcMat)
    {
-      return new Runnable()
+      int srcSize = srcMat.cols() * srcMat.rows();
+      BooleanArrayBinaryImage output = new BooleanArrayBinaryImage(srcMat.cols(), srcMat.rows());
+      
+      byte[] outImageByteArray = new byte[srcSize]; 
+      srcMat.get(0, 0, outImageByteArray);
+      for (int i = 0; i < srcSize; i++)
       {
-         
+         if (outImageByteArray[i] == 0)
+            output.setForeground(i);
+      }
+      
+      return output;
+   }
+   
+   @Override
+   public Callable<BinaryImage> create(TransformerContext ctx)
+   {
+      OpenCvMatrix ref = (OpenCvMatrix)ctx.getValue(IMAGE_MATRIX_PIN);
+      // HACK: since the referenced matix may be disposed once this method exits,
+      //       we'll copy the data out to a binary image here.
+      BinaryImage binaryImage = adapt(ref.get());
+      return new Callable<BinaryImage>()
+      {
+         // TODO create a simple pass through adapter.
          @Override
-         public void run()
+         public BinaryImage call()
          {
-            Mat srcMat = ((OpenCvMatrix)source.get()).get();
-            int srcSize = srcMat.cols() * srcMat.rows();
-            BooleanArrayBinaryImage output = new BooleanArrayBinaryImage(srcMat.cols(), srcMat.rows());
-            byte[] outImageByteArray = new byte[srcSize]; 
-            srcMat.get(0, 0, outImageByteArray);
-            for (int i = 0; i < srcSize; i++)
-            {
-               if (outImageByteArray[i] == 0)
-                  output.setForeground(i);
-            }
-            
-            ((DataSink)sink).accept((BinaryImage)output);
+            return binaryImage;
          }
       };
    }
