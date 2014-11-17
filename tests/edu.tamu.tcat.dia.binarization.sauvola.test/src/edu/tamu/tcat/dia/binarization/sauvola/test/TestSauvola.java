@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Hashtable;
+import java.util.concurrent.Callable;
 
 import javax.imageio.ImageIO;
 
@@ -70,23 +71,21 @@ public class TestSauvola
       final BufferedImage image = ImageIO.read(Files.newInputStream(imagePath, StandardOpenOption.READ));
 
       IntegralImageImpl iImage = IntegralImageImpl.create(image.getData());
-      Runnable runnable = thresholder.create(() -> { return iImage; }, (im) -> {
-         try
+      Callable<BinaryImage> task = thresholder.create((key) -> { return key.equalsIgnoreCase("integral_image") ? iImage : null; });
+      try
+      {
+         BinaryImage im = task.call();
+         try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
          {
-            try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
-            {
-               ImageIO.write(toImage((BinaryImage)im, image), "png", out);
-               out.flush();
-            }
+            ImageIO.write(toImage((BinaryImage)im, image), "png", out);
+            out.flush();
          }
-         catch (Exception e)
-         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
-      }); 
-      
-      runnable.run();
+      }
+      catch (Exception e)
+      {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
    }
    
    private void checkConfig(FastSauvolaTransformer thresholder, double k, int window)
