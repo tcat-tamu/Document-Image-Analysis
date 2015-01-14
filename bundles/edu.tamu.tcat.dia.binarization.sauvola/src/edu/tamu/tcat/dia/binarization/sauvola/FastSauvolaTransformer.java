@@ -111,7 +111,7 @@ public class FastSauvolaTransformer implements Transformer
       final IntegralImage intImage = (IntegralImage)ctx.getValue(INTEGRAL_IMAGE_PIN);
       final BufferedImage bufImage = (BufferedImage)ctx.getValue(BUFFERED_IMAGE_PIN);
       
-      if (intImage == null || bufImage == null)
+      if (intImage == null && bufImage == null)
          throw new IllegalStateException("No input image supplied");
       
       return new Callable<BinaryImage>()
