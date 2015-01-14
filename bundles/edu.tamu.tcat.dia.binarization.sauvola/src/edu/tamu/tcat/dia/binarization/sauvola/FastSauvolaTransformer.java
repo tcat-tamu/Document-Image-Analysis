@@ -23,8 +23,8 @@ import edu.tamu.tcat.dia.binarization.BinaryImage;
  */
 public class FastSauvolaTransformer implements Transformer
 {
-   private static final String INTEGRAL_IMAGE_PIN = "integral_image";
-   private static final String BUFFERED_IMAGE_PIN = "buffered_image";
+   public static final String INTEGRAL_IMAGE_PIN = "integral_image";
+   public static final String BUFFERED_IMAGE_PIN = "buffered_image";
 
    public static final String EXTENSION_ID = "tcat.dia.binarizers.fastsauvola";
    
@@ -108,7 +108,6 @@ public class FastSauvolaTransformer implements Transformer
    @Override
    public Callable<BinaryImage> create(TransformerContext ctx)
    {
-      // TODO Auto-generated method stub
       final IntegralImage intImage = (IntegralImage)ctx.getValue(INTEGRAL_IMAGE_PIN);
       final BufferedImage bufImage = (BufferedImage)ctx.getValue(BUFFERED_IMAGE_PIN);
       
