@@ -26,7 +26,7 @@ public class CCAnalyzer implements Transformer
 {
    
    public final static String EXTENSION_ID = "tcat.dia.segmentation.cc.twopass"; 
-   private static final String BINARY_IMAGE_PIN = "binary_image";
+   public static final String BINARY_IMAGE_PIN = "binary_image";
 
 
    final static int MAX_LABELS = 100_000;
