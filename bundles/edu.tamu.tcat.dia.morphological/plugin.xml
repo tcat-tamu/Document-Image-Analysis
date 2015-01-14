@@ -31,18 +31,6 @@
             </input_pin>
          </inputs>
       </transformer>
-      <transformer
-            class="edu.tamu.tcat.dia.morphological.Transformer9"
-            id="edu.tamu.tcat.dia.morphological.transformer9"
-            title="edu.tamu.tcat.dia.morphological.transformer9">
-         <inputs>
-            <input_pin
-                  label="edu.tamu.tcat.dia.morphological.input_pin12"
-                  required="true"
-                  type="edu.tamu.tcat.dia.morphological.Input_pin12">
-            </input_pin>
-         </inputs>
-      </transformer>
    </extension>
 
 </plugin>
