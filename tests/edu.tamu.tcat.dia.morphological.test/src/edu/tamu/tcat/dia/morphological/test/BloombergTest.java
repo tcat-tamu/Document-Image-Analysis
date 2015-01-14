@@ -21,8 +21,10 @@ import javax.imageio.ImageReader;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
+import edu.tamu.tcat.dia.binarization.ThresholdedBinaryImage;
 import edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaBinarizer;
 import edu.tamu.tcat.dia.morphological.DilationOperator;
 import edu.tamu.tcat.dia.morphological.ErosionOperator;
@@ -137,15 +139,42 @@ public class BloombergTest
          ImageIO.write(toImage((BinaryImage)binReducedImage2, image), "png", out);
          out.flush();
       }
+      
+      dataDir = Paths.get("C:\\Users\\deepa.narayanan\\git\\citd.dia\\tests\\edu.tamu.tcat.dia.binarization.sauvola.test\\res\\output");
+      Path imagePath = dataDir.resolve("00000008-bin-reduced4.png");
+      if (!Files.exists(imagePath))
+         throw new IllegalArgumentException("Source image does not exist [" + imagePath + "]");
+      
+      String filename = imagePath.toString();
+      String dilatedFilename = "C:\\Users\\deepa.narayanan\\git\\citd.dia\\tests\\edu.tamu.tcat.dia.binarization.sauvola.test\\res\\output\\00000008-dilated.png";
+      String erodedFilename = "C:\\Users\\deepa.narayanan\\git\\citd.dia\\tests\\edu.tamu.tcat.dia.binarization.sauvola.test\\res\\output\\00000008-eroded.png";
+      
+      System.out.println("Will run opening with SE=5x5 element");
+      System.out.println("Eroding first");
+      ErosionOperator eroder = new ErosionOperator(filename, erodedFilename, null, null);
+      eroder.run();
+      
+      System.out.println("Dilating now");
+      BufferedImage input = ImageIO.read(Paths.get(erodedFilename).toFile());
+      BinaryImage bin = new ThresholdedBinaryImage(input, 100);
+      DilationOperator dilator = new DilationOperator(bin);
+      BinaryImage result = dilator.run();
+      ImageIO.write(BinaryImage.toBufferedImage(result, input), "png", Files.newOutputStream(Paths.get(dilatedFilename), StandardOpenOption.CREATE, StandardOpenOption.WRITE));
+      
+      //need binary image to run 
+      dataDir = Paths.get("C:\\Users\\deepa.narayanan\\git\\citd.dia\\tests\\edu.tamu.tcat.dia.binarization.sauvola.test\\res\\output");
+      imagePath = dataDir.resolve("00000008-dilated.png");
+      if (!Files.exists(imagePath))
+         throw new IllegalArgumentException("Source image does not exist [" + imagePath + "]");
 
-      logger.info("Will run opening with SE=3x3 element");
-      logger.info("Eroding first");
-      ErosionOperator eroder = new ErosionOperator(binReducedImage4, 3);
-      binEroded = eroder.run();
-
-      logger.info("Dilating now");
-      DilationOperator dilator = new DilationOperator(binEroded, 3);
-      binDilated = dilator.run();
+//      logger.info("Will run opening with SE=3x3 element");
+//      logger.info("Eroding first");
+//      ErosionOperator eroder = new ErosionOperator(binReducedImage4, 3);
+//      binEroded = eroder.run();
+//
+//      logger.info("Dilating now");
+//      DilationOperator dilator = new DilationOperator(binEroded, 3);
+//      binDilated = dilator.run();
 
       outputPath = dataDir.resolve("afterOpening.png");
       try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
