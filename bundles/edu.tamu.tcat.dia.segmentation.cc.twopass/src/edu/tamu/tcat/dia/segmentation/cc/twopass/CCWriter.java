@@ -3,8 +3,6 @@ package edu.tamu.tcat.dia.segmentation.cc.twopass;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -16,7 +14,6 @@ import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.analytics.image.region.BoundingBox;
 import edu.tamu.tcat.analytics.image.region.Point;
-import edu.tamu.tcat.dia.datatrax.ImageWriterUtils;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectedComponent;
 
@@ -25,11 +22,7 @@ public class CCWriter implements Transformer
 
    public static final String EXTENSION_ID = "tcat.dia.seg.adapters.cc.writer";
    public static final String CONNECTED_COMPONENTS_PIN = "connected_components";
-
-
-   private Path path;
-   private String format = "jpg";
-   private byte[] model;
+   public static final String MODEL_PIN = "model";
 
    private int[][] colorMap = DEFAULT_COLOR_MAP;
    private static int[][] DEFAULT_COLOR_MAP = new int[][]
@@ -53,21 +46,6 @@ public class CCWriter implements Transformer
       // TODO Auto-generated constructor stub
    }
 
-   public void setPath(Path path) throws TransformerConfigurationException
-   {
-      this.path = ImageWriterUtils.processOutputImagePath(path);
-   }
-   
-   public void setFormat(String format) throws TransformerConfigurationException
-   {
-      this.format = ImageWriterUtils.checkFormat(format);
-   }
-
-   public void setModel(BufferedImage model)
-   {
-      this.model = ImageWriterUtils.getModelData(model);
-   }
-   
    public void setColorMap(int[][] colorMap)
    {
       if (colorMap == null) 
@@ -87,28 +65,12 @@ public class CCWriter implements Transformer
          
          setColorMap((int[][])cMap);
       }
-      
-      this.path = ImageWriterUtils.processOutputImagePath((Path)data.get("path"));
-      this.format = ImageWriterUtils.checkFormat((String)data.get("format"));
-      
-      this.format = ImageWriterUtils.checkFormat((String)data.get("format"));
-      
-      Object model = data.get("model");
-      if (model instanceof BufferedImage)
-         this.model = ImageWriterUtils.getModelData((BufferedImage)model);
-      else if (model instanceof byte[])
-         this.model = (byte[])model;
-      else
-         throw new TransformerConfigurationException("Invalid type for model data. Expected BufferedImage or byte[] but found " + model.getClass());
    }
 
    @Override
    public Map<String, Object> getConfiguration()
    {
       HashMap<String, Object> config = new HashMap<String, Object>();
-      config.put("path", path);
-      config.put("format", format);
-      config.put("model", model);
       config.put("colorMap", colorMap);
       
       return config;
@@ -118,19 +80,14 @@ public class CCWriter implements Transformer
    public Callable<BufferedImage> create(TransformerContext ctx)
    {
       final ConnectComponentSet components = (ConnectComponentSet)ctx.getValue(CONNECTED_COMPONENTS_PIN);
+      final BufferedImage modelImage = (BufferedImage)ctx.getValue(MODEL_PIN);
+
       return new Callable<BufferedImage>()
       {
          @Override
          public BufferedImage call()
          {
-            try 
-            {
-               return render(components, ImageWriterUtils.restoreModel(model), colorMap);
-            }
-            catch (IOException e)
-            {
-               throw new IllegalStateException("Failed to instantiate model image.", e);
-            }
+            return render(components, modelImage, colorMap);
          }
       };
    }
