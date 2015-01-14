@@ -29,6 +29,12 @@
                   required="true"
                   type="edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet">
             </input_pin>
+            <input_pin
+                  description="A buffered image that provides the model data for the output image"
+                  label="model"
+                  required="true"
+                  type="java.awt.image.BufferedImage">
+            </input_pin>
          </inputs>
       </transformer>
    </extension>
