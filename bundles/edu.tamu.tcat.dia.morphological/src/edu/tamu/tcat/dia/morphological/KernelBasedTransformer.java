@@ -41,7 +41,7 @@ public abstract class KernelBasedTransformer implements Transformer
          }
          catch (Exception e)
          {
-            ERROR_LOGGER.log(Level.SEVERE, "Failded to parse config parameter kernel_size. Expected integer value but found [" + o + "].", e);
+            ERROR_LOGGER.log(Level.SEVERE, "Failed to parse config parameter kernel_size. Expected integer value but found [" + o + "].", e);
          }
       }
    }
