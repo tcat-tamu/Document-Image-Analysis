@@ -8,7 +8,7 @@ import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
-import edu.tamu.tcat.dia.morphological.ThresholdReducer;
+import edu.tamu.tcat.dia.segmentation.images.bloomberg.ThresholdReducer;
 
 public class ThresholdReducerTransformer implements Transformer
 {

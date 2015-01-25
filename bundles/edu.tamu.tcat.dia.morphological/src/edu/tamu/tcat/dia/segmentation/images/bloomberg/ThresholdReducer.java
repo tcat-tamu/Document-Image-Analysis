@@ -1,4 +1,4 @@
-package edu.tamu.tcat.dia.morphological;
+package edu.tamu.tcat.dia.segmentation.images.bloomberg;
 
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.BooleanArrayBinaryImage;

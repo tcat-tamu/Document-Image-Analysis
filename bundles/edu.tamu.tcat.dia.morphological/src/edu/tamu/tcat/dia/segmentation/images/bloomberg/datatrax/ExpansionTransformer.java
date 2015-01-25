@@ -1,4 +1,4 @@
-package edu.tamu.tcat.dia.morphological;
+package edu.tamu.tcat.dia.segmentation.images.bloomberg.datatrax;
 
 import java.util.HashMap;
 import java.util.Map;
