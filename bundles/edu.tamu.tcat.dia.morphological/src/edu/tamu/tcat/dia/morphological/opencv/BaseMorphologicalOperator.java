@@ -29,7 +29,7 @@ public class BaseMorphologicalOperator
    {
       closeInputImage();
    
-      this.input = BinaryImageHelper.toMatrix(image);
+      this.input = OpenCvImageHelper.toMatrix(image);
       shouldCloseImage = true;
    }
 
