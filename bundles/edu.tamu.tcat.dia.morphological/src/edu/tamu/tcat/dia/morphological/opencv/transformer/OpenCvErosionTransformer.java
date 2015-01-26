@@ -6,7 +6,7 @@ import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
 import edu.tamu.tcat.analytics.datatrax.TransformerContext;
-import edu.tamu.tcat.dia.morphological.OpenCvMatrix;
+import edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix;
 
 public class OpenCvErosionTransformer extends KernelBasedTransformer 
 {

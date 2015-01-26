@@ -12,7 +12,9 @@ Import-Package: edu.tamu.tcat.analytics.datatrax,
  edu.tamu.tcat.dia.segmentation.cc.twopass
 Export-Package: edu.tamu.tcat.dia.morphological,
  edu.tamu.tcat.dia.morphological.opencv,
+ edu.tamu.tcat.dia.morphological.opencv.transformer,
  edu.tamu.tcat.dia.segmentation.images.bloomberg,
+ edu.tamu.tcat.dia.segmentation.images.bloomberg.datatrax,
  org.opencv.core,
  org.opencv.imgproc
 Bundle-ClassPath: lib/opencv-249.jar,

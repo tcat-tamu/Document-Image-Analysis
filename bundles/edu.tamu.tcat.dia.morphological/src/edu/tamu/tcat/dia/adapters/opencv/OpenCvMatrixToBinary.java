@@ -11,7 +11,7 @@ import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.BooleanArrayBinaryImage;
-import edu.tamu.tcat.dia.morphological.OpenCvMatrix;
+import edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix;
 
 public class OpenCvMatrixToBinary implements Transformer
 {

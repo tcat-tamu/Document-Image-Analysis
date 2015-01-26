@@ -13,7 +13,7 @@ import org.opencv.imgproc.Imgproc;
 import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.analytics.datatrax.TransformerContext;
-import edu.tamu.tcat.dia.morphological.OpenCvMatrix;
+import edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix;
 
 public class OpenCvGaussianBlurTransformer implements Transformer
 {

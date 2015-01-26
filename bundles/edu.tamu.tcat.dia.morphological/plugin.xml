@@ -6,7 +6,7 @@
       <transformer
             class="edu.tamu.tcat.dia.adapters.opencv.BinaryToOpenCvMatrix"
             id="tcat.dia.adapters.opencv.binary2matrix"
-            output_type="edu.tamu.tcat.dia.morphological.OpenCvMatrix"
+            output_type="edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix"
             title="BinaryImage to OpenCV Matrix Adapter">
          <inputs>
             <input_pin
@@ -27,7 +27,7 @@
                   description="The OpenCVMatrix to be converted into a BinaryImage"
                   label="image_matrix"
                   required="true"
-                  type="edu.tamu.tcat.dia.morphological.OpenCvMatrix">
+                  type="edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix">
             </input_pin>
          </inputs>
       </transformer>
