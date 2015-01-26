@@ -24,9 +24,9 @@ import org.junit.Test;
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaBinarizer;
-import edu.tamu.tcat.dia.morphological.DilationOperator;
-import edu.tamu.tcat.dia.morphological.ErosionOperator;
-import edu.tamu.tcat.dia.morphological.ThresholdReducer;
+import edu.tamu.tcat.dia.morphological.MorphologicalOperationException;
+import edu.tamu.tcat.dia.morphological.opencv.OpenCVDilationOperator;
+import edu.tamu.tcat.dia.morphological.opencv.OpenCVErosionOperator;
 
 public class DilationTests
 {
@@ -91,17 +91,22 @@ public class DilationTests
    }
 
    @Test
-   public void testDilation() throws IOException
+   public void testDilation() throws IOException, MorphologicalOperationException
    {	
       //DilationOperator dilator = new DilationOperator(filename, outFilename, null,null);
       
-	   DilationOperator dilator = new DilationOperator(binImage, 5);
-      binDilatedImage = dilator.run();
+      OpenCVDilationOperator dilator = new OpenCVDilationOperator();
+	   dilator.setStructuringElement(5);
+	   dilator.setInput(binImage);
+	   dilator.execute();
+      binDilatedImage = dilator.getResult();
       
+      OpenCVErosionOperator eroder = new OpenCVErosionOperator();
+      eroder.setStructuringElement(10);
+      eroder.setInput(binImage);
+      eroder.execute();
+      binErodedImage = eroder.getResult();
       
-      
-      ErosionOperator eroder = new ErosionOperator(binImage, 10);
-      binErodedImage = eroder.run();
       
       /*Path outputPath = dataDir.resolve("output/dilated-image.png");
       try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))

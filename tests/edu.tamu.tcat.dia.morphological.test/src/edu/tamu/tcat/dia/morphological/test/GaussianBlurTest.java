@@ -83,17 +83,17 @@ public class GaussianBlurTest
    public void testDilation() throws IOException
    {	
       
-	   GaussianBlurOperator gBlurOp = new GaussianBlurOperator(binImage, 3, 8.0, 2.0);
-      binBlurredImage = gBlurOp.run();
-      
-      dataDir = Paths.get("C:\\Projects\\VisualPage\\imageoutputs");
-      Path outputPath = dataDir.resolve("00000011-blurred.png");
-      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
-      {
-         ImageIO.write(toImage((BinaryImage)binBlurredImage, image), "png", out);
-         out.flush();
-      }
-      
-      assertTrue("", true);
+//	   GaussianBlurOperator gBlurOp = new GaussianBlurOperator(binImage, 3, 8.0, 2.0);
+//      binBlurredImage = gBlurOp.run();
+//      
+//      dataDir = Paths.get("C:\\Projects\\VisualPage\\imageoutputs");
+//      Path outputPath = dataDir.resolve("00000011-blurred.png");
+//      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
+//      {
+//         ImageIO.write(toImage((BinaryImage)binBlurredImage, image), "png", out);
+//         out.flush();
+//      }
+//      
+//      assertTrue("", true);
    }
 }

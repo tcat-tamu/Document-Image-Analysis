@@ -29,7 +29,7 @@ import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaBinarizer;
 import edu.tamu.tcat.dia.morphological.RunLengthRatioGenerator;
-import edu.tamu.tcat.dia.morphological.ThresholdReducer;
+import edu.tamu.tcat.dia.segmentation.images.bloomberg.ThresholdReducer;
 
 public class RLGeneratorTest
 {
