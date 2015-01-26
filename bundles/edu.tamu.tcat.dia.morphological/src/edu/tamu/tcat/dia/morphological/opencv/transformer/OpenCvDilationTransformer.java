@@ -6,7 +6,6 @@ import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
 import edu.tamu.tcat.analytics.datatrax.TransformerContext;
-import edu.tamu.tcat.dia.morphological.KernelBasedTransformer;
 import edu.tamu.tcat.dia.morphological.OpenCvMatrix;
 
 public class OpenCvDilationTransformer extends KernelBasedTransformer 

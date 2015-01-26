@@ -1,4 +1,4 @@
-package edu.tamu.tcat.dia.morphological;
+package edu.tamu.tcat.dia.morphological.opencv.transformer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +11,7 @@ import org.opencv.imgproc.Imgproc;
 
 import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
+import edu.tamu.tcat.dia.morphological.OpenCvMatrix;
 
 public abstract class KernelBasedTransformer implements Transformer
 {
