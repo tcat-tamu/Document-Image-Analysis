@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.tamu.tcat.analytics.image.region.BoundingBox;
+import edu.tamu.tcat.analytics.image.region.BoxUtils;
 import edu.tamu.tcat.analytics.image.region.Point;
 import edu.tamu.tcat.analytics.image.region.SimpleBoundingBox;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectedComponent;
@@ -49,6 +50,33 @@ public class SimpleCC implements ConnectedComponent {
       return sequence;
    }
 	
+	@Override
+	public boolean intersects(ConnectedComponent cc)
+	{
+	   if (!BoxUtils.intersects(getBounds(), cc.getBounds()))
+	      return false;
+	   
+	   return (cc instanceof SimpleCC) 
+	         ? intersectsInternal((SimpleCC)cc) 
+            : intersectsGeneral(cc);
+	}
+	
+	private boolean intersectsGeneral(ConnectedComponent cc)
+	{
+	   throw new UnsupportedOperationException();
+	}
+	
+	private boolean intersectsInternal(SimpleCC cc)
+	{
+	   for (Point p : points)
+	   {
+	      if (cc.points.contains(p))
+	         return true;
+	   }
+	   
+	   return false;
+	}
+	
 	void add(int x, int y)
 	{
 		if (xMin < 0 || xMin > x)
@@ -91,5 +119,23 @@ public class SimpleCC implements ConnectedComponent {
          return y;
       }
 	   
+      @Override
+      public boolean equals(Object obj)
+      {
+         if (!(obj instanceof Point))
+            return false;
+         
+         Point p = (Point)obj;
+         return this.x == p.getX() && this.y == p.getY();
+      }
+      
+      @Override
+      public int hashCode()
+      {
+         int result = 17;
+         result = 37 * result + x;
+         result = 37 * result + y;
+         return result;
+      }
 	}
 }

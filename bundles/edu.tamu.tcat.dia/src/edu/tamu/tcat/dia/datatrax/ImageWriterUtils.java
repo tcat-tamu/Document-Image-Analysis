@@ -138,7 +138,7 @@ public final class ImageWriterUtils
    {
       try (OutputStream out = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
       {
-         BufferedImage im = BinaryImage.toBufferedImage(image, restoreModel(model));
+         BufferedImage im = BinaryImage.toBufferedImage(image);
          ImageIO.write(im, format, out);
          out.flush();
       }

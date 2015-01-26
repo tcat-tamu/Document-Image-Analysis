@@ -6,7 +6,7 @@ import java.util.Collection;
  * Represents a set of connected components extracted from a common source such as a page
  * image.
  */
-public interface ConnectComponentSet
+public interface ConnectComponentSet extends Iterable<ConnectedComponent>
 {
 
    /**

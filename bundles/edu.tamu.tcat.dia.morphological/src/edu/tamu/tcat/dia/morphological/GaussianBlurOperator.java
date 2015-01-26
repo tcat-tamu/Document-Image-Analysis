@@ -1,90 +1,63 @@
 package edu.tamu.tcat.dia.morphological;
 
-import java.util.logging.Logger;
+import java.awt.image.BufferedImage;
 
 import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import edu.tamu.tcat.dia.binarization.BinaryImage;
-import edu.tamu.tcat.dia.binarization.BooleanArrayBinaryImage;
+import edu.tamu.tcat.dia.morphological.opencv.util.BufferedImageAdapterStrategy;
+import edu.tamu.tcat.dia.morphological.opencv.util.StandardBufferedImageAdapters;
 
 public class GaussianBlurOperator
 {
-   private final static Logger logger = Logger.getLogger("edu.tamu.tcat.dia.morph.gaussianBlur");
+   static { System.loadLibrary(Core.NATIVE_LIBRARY_NAME); } // static initializer to load DLL. 
 
-   // static initializer to load DLL. 
-   static
+   private BufferedImageAdapterStrategy getStrategy(BufferedImage input)
    {
-      System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-   }
-
-   public static byte boolToByte(boolean b)
-   {
-      return (byte)(b ? 0 : 1);
-   }
-
-   private final BinaryImage input;
-   private int kernelSize;
-   private double sigmaX, sigmaY;
-
-   public GaussianBlurOperator(BinaryImage source, int kSize, double sigmaX, double sigmaY)
-   {
-      this.input = source;
-      this.kernelSize = kSize;
-      this.sigmaX = sigmaX;
-      this.sigmaY = sigmaY;
-
-   }
-
-   public BinaryImage run()
-   {
-      // TODO should probably only do this once.
-
-      int h = input.getHeight();
-      int w = input.getWidth();
-      Mat sourceImage = new Mat(h, w, CvType.CV_8U);
-      Mat destination = new Mat(h, w, CvType.CV_8U);
-      try
+      for (StandardBufferedImageAdapters adapter : StandardBufferedImageAdapters.values())
       {
-         sourceImage.put(0, 0, toByteArray(input));
-         Imgproc.GaussianBlur(sourceImage, destination, new Size(kernelSize, kernelSize), sigmaX, sigmaY);
-         return writeOutput(destination);
+         if (input.getType() == adapter.getBufferedImageType())
+            return adapter;
       }
-      finally
-      {
-         sourceImage.release();
-         destination.release();
-      }
+      
+      return StandardBufferedImageAdapters.BGR_3BYTE;    // Use this as a default. Will force conversion of the imput image.
    }
-
-   private static byte[] toByteArray(BinaryImage data)
+   
+   public BufferedImage blur(BufferedImage input, int kSize, double sigmaX, double sigmaY) throws Exception
    {
-      int sz = data.getSize();
-      byte[] imageByteArray = new byte[sz];
-      for (int i = 0; i < sz; i++)
+      if (kSize < 0 || kSize % 2 != 1)
+         throw new IllegalArgumentException("The supplied kernel size [" + kSize + "] must be positive and odd.");
+      
+      try 
       {
-         imageByteArray[i] = boolToByte(data.isForeground(i));
+         Mat sourceImage = null;  
+         Mat destination = null;
+         try
+         {
+            // TODO ensure that this is a valid type. See doc on GaussianBlur method below
+            BufferedImageAdapterStrategy strategy = getStrategy(input);
+            sourceImage = strategy.adapt(input);
+            destination = strategy.fromTemplate(input);
+
+            // TODO need to learn how these work better and document
+            Imgproc.GaussianBlur(sourceImage, destination, new Size(kSize, kSize), sigmaX, sigmaY);
+
+            return strategy.adapt(destination);
+         }
+         finally
+         {
+            if (sourceImage != null)
+               sourceImage.release();
+
+            if (destination != null)
+               destination.release();
+         }
       }
-
-      return imageByteArray;
-   }
-
-   private BinaryImage writeOutput(Mat destination)
-   {
-      BooleanArrayBinaryImage output = new BooleanArrayBinaryImage(input.getWidth(), input.getHeight());
-      logger.fine("Writing to binary array");
-      byte[] outImageByteArray = new byte[input.getSize()];
-      destination.get(0, 0, outImageByteArray);
-      for (int i = 0; i < input.getSize(); i++)
+      catch (Exception ex)
       {
-         if (outImageByteArray[i] == 0)
-            output.setForeground(i);
+         throw new Exception("", ex);
       }
-
-      return output;
    }
-
 }

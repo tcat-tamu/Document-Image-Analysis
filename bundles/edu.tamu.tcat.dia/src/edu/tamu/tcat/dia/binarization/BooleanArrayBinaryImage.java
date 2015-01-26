@@ -3,6 +3,7 @@ package edu.tamu.tcat.dia.binarization;
 
 public class BooleanArrayBinaryImage implements BinaryImage
 {
+   // TODO note that this is HUGELY inefficient
    private final boolean[] image;
    private final int width;
    private final int height;

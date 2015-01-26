@@ -43,5 +43,7 @@ public interface ConnectedComponent
     *       glyphs on a page. 
     */
    int getSequence();
+   
+   boolean intersects(ConnectedComponent cc);
 
 }

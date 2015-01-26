@@ -1,20 +1,18 @@
 package edu.tamu.tcat.dia.binarization;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
-import java.util.Hashtable;
 
 public interface BinaryImage
 {
-   public static BufferedImage toBufferedImage(BinaryImage im, BufferedImage model)
+   public static BufferedImage toBufferedImage(BinaryImage im)
    {
-      int offset = 0;
       int width = im.getWidth();
       int height = im.getHeight();
 
-      ColorModel colorModel = model.getColorModel();
-      WritableRaster raster = colorModel.createCompatibleWritableRaster(width, height);
+      BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+      WritableRaster raster = image.getRaster();
+      int offset = 0;
       int numBands = raster.getNumBands();
       for (int r = 0; r < height; r++)
       {
@@ -28,7 +26,7 @@ public interface BinaryImage
          offset += width;
       }
 
-      return new BufferedImage(colorModel, raster, true, new Hashtable<>());
+      return image;
    }
    
    int getWidth();

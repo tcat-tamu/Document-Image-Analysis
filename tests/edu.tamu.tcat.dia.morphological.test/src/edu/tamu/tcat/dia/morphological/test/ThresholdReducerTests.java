@@ -1,12 +1,9 @@
 package edu.tamu.tcat.dia.morphological.test;
 
-import static org.junit.Assert.assertTrue;
-
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,7 +21,6 @@ import org.junit.Test;
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaBinarizer;
-import edu.tamu.tcat.dia.morphological.ThresholdReducer;
 
 public class ThresholdReducerTests
 {
@@ -86,23 +82,23 @@ public class ThresholdReducerTests
    public void testThresholdReducer() throws IOException
    {
 
-      Path outputPath = dataDir.resolve("output/00000009-bin.png");
-      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
-      {
-         ImageIO.write(toImage((BinaryImage)binImage, image), "png", out);
-         out.flush();
-      }
-      
-      ThresholdReducer reducer = new ThresholdReducer(binImage, 4, 1);
-      binReducedImage = reducer.run();
-      
-      outputPath = dataDir.resolve("output/00000009-bin-reduced.png");
-      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
-      {
-         ImageIO.write(toImage((BinaryImage)binReducedImage, image), "png", out);
-         out.flush();
-      }
-      
-      assertTrue("", true);
+//      Path outputPath = dataDir.resolve("output/00000009-bin.png");
+//      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
+//      {
+//         ImageIO.write(toImage((BinaryImage)binImage, image), "png", out);
+//         out.flush();
+//      }
+//      
+//      ThresholdReducer reducer = new ThresholdReducer(binImage, 4, 1);
+//      binReducedImage = reducer.run();
+//      
+//      outputPath = dataDir.resolve("output/00000009-bin-reduced.png");
+//      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
+//      {
+//         ImageIO.write(toImage((BinaryImage)binReducedImage, image), "png", out);
+//         out.flush();
+//      }
+//      
+//      assertTrue("", true);
    }
 }
