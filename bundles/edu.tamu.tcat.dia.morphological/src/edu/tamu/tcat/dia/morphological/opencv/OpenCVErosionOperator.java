@@ -50,6 +50,4 @@ public final class OpenCVErosionOperator extends BaseMorphologicalOperator imple
          throw new MorphologicalOperationException("Image dilation failed", ex);
       }
    }
-
-
 }
