@@ -1,45 +1,36 @@
 package edu.tamu.tcat.dia.morphological.test;
 
-import static org.junit.Assert.assertTrue;
-
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
+import edu.tamu.tcat.analytics.image.region.Point;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
-import edu.tamu.tcat.dia.binarization.ThresholdedBinaryImage;
+import edu.tamu.tcat.dia.binarization.BooleanArrayBinaryImage;
 import edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaBinarizer;
-import edu.tamu.tcat.dia.morphological.DilationOperator;
-import edu.tamu.tcat.dia.morphological.ErosionOperator;
-import edu.tamu.tcat.dia.morphological.ExpansionOperator;
-import edu.tamu.tcat.dia.morphological.ThresholdReducer;
-import edu.tamu.tcat.dia.morphological.UnionOperator;
+import edu.tamu.tcat.dia.morphological.MorphologicalOperationException;
+import edu.tamu.tcat.dia.morphological.opencv.OpenCVClosingOperator;
+import edu.tamu.tcat.dia.morphological.opencv.OpenCVErosionOperator;
+import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
+import edu.tamu.tcat.dia.segmentation.cc.ConnectedComponent;
+import edu.tamu.tcat.dia.segmentation.cc.twopass.Finder;
+import edu.tamu.tcat.dia.segmentation.images.bloomberg.ExpansionOperator;
+import edu.tamu.tcat.dia.segmentation.images.bloomberg.ThresholdReducer;
 
 public class BloombergTest
 {
-
-   private BufferedImage image;
-   private BinaryImage binImage, unionImage, binEroded, binDilated, binDilated2;
-   private BinaryImage binExpandedImage1, binExpandedImage2, binExpandedImage3, binExpandedImage4;
-   private BinaryImage binReducedImage1, binReducedImage2, binReducedImage3, binReducedImage4, binReducedImageInter;
-   private Path dataDir;
    private final static Logger logger = Logger.getLogger("edu.tamu.tcat.dia.morphological.test.bloomberg");
 
    public BloombergTest()
@@ -47,179 +38,145 @@ public class BloombergTest
       // TODO Auto-generated constructor stub
    }
 
-   public static BufferedImage toImage(BinaryImage im, BufferedImage model)
-   {
-      int offset = 0;
-      int width = im.getWidth();
-      int height = im.getHeight();
 
-      ColorModel colorModel = model.getColorModel();
-      WritableRaster raster = colorModel.createCompatibleWritableRaster(width, height);
-      int numBands = raster.getNumBands();
-      for (int r = 0; r < height; r++)
-      {
-         for (int c = 0; c < width; c++)
-         {
-            int value = im.isForeground(offset + c) ? 0 : 255;
-            for (int b = 0; b < numBands; b++)
-               raster.setSample(c, r, b, value);
-         }
-
-         offset += width;
-      }
-
-      return new BufferedImage(colorModel, raster, true, new Hashtable<>());
-   }
-
-   @SuppressWarnings("unused")
    @Before
    public void setup() throws IOException
    {
-      dataDir = Paths.get("C:\\Projects\\VisualPage\\images");
-      Path imagePath = dataDir.resolve("00000009.jp2");
+   }
+
+   private BinaryImage loadImage(Path imagePath) throws IOException
+   {
+//      Path imagePath = dataDir.resolve("00000009.jp2");
       if (!Files.exists(imagePath))
          throw new IllegalArgumentException("Source image does not exist [" + imagePath + "]");
 
-      Iterator<ImageReader> imageReadersBySuffix = ImageIO.getImageReadersBySuffix("jp2");
-      image = ImageIO.read(Files.newInputStream(imagePath, StandardOpenOption.READ));
+      BufferedImage image = ImageIO.read(imagePath.toFile());
       Objects.requireNonNull(image, "Failed to load source image [" + imagePath + "]");
 
       IntegralImageImpl iImage = IntegralImageImpl.create(image.getData());
       FastSauvolaBinarizer binarizer = new FastSauvolaBinarizer(iImage, image.getWidth() / 15, 0.3);
-      binImage = binarizer.run();
+      return binarizer.run();
+   }
+   
+   @Test
+   public void testBloomberg() throws IOException, MorphologicalOperationException
+   {
+      Path inputDir = Paths.get("I:\\Projects\\HathiTrust WCSA\\WCSA initial small dataset");
+      Path outputBaseDir = Paths.get("I:\\Projects\\HathiTrust WCSA\\WCSA test results");
+      
+      String volumeId = "ark+=13960=t0xp6w53s";
+//      String volumeId = "ark+=13960=t00z72x8w";
+      String imageId = "00000035";
+      Path imagePath = inputDir.resolve(volumeId).resolve(imageId + ".jp2");
+      Path outputDir = outputBaseDir.resolve(volumeId).resolve(imageId);
+      Files.createDirectories(outputDir);
+      
+      BinaryImage initial = loadImage(imagePath);
+      long start = System.currentTimeMillis();
 
+      writeImage(initial, outputDir, "original");
+      logger.info("Pass 1:");
+      
+      // 4x1 threshold reduction with T = 1 (2x)
+      BinaryImage initialReduction = ThresholdReducer.threshold(initial, 1);
+      initialReduction = ThresholdReducer.threshold(initialReduction, 1);
+      
+//      writeImage(initialReduction, outputDir, "initial_reduction");
+      
+      // 4x1 threshold reduction with T = 4
+      BinaryImage intermediate = ThresholdReducer.threshold(initialReduction, 4);
+//      writeImage(intermediate, outputDir, "T4");
+      
+      // 4x1 threshold reduction with T = 3
+      intermediate = ThresholdReducer.threshold(intermediate, 3);
+//      writeImage(intermediate, outputDir, "T3");
+      
+      // opening with SE 5x5
+      try (OpenCVClosingOperator opening = new OpenCVClosingOperator())
+      {
+         opening.setInput(intermediate);
+         opening.setStructuringElement(5);
+         opening.execute();
+         intermediate = opening.getResult();
+//         writeImage(intermediate, outputDir, "opened");
+      }
+      
+      // 1X4 expansion (twice)
+      intermediate = ExpansionOperator.expand(intermediate);
+      intermediate = ExpansionOperator.expand(intermediate);
+//      writeImage(intermediate, outputDir, "seed");
+
+      // Union of overlapping components (initialReduction)
+      intermediate = computeIntersection(initialReduction, intermediate);
+//      writeImage(intermediate, outputDir, "union");
+      
+      // Dilation with SE 3x3
+      try (OpenCVErosionOperator dilator = new OpenCVErosionOperator())
+      {
+         dilator.setInput(intermediate);
+         dilator.setStructuringElement(3);
+         dilator.execute();
+         intermediate = dilator.getResult();
+//         writeImage(intermediate, outputDir, "eroded");
+      }
+      // 1X4 expansion (twice)
+      intermediate = ExpansionOperator.expand(intermediate);
+      intermediate = ExpansionOperator.expand(intermediate);
+
+      long end = System.currentTimeMillis();
+      System.out.println("Elapsed Time: " + (end - start));
+      writeImage(intermediate, outputDir, "mask");
+      
    }
 
-   @Test
-   public void testBloomberg() throws IOException
+
+   private BinaryImage computeIntersection(BinaryImage initialReduction, BinaryImage intermediate)
    {
-
-      logger.info("Will run 4x1 Threshold reducer twice, T=3");
-
-      logger.info("Pass 1:");
-      ThresholdReducer reducer = new ThresholdReducer(binImage, 4, 3);
-      binReducedImage1 = reducer.run();
-      logger.info("binReducedImage1 size: " + binReducedImage1.getHeight() + "," + binReducedImage1.getWidth());
-
-      Path outputPath = dataDir.resolve("reduction1.png");
-      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
+      Finder ccFinder = new Finder(intermediate, 1000);
+      ConnectComponentSet seedComponents = ccFinder.call();
+      ccFinder = new Finder(initialReduction, 10000);
+      ConnectComponentSet sourceCCs = ccFinder.call();
+      
+//      System.out.println(seedComponents.listLabels().size());
+//      System.out.println(sourceCCs.listLabels().size());
+      Set<ConnectedComponent> union = new HashSet<>();
+//      int ct = 0;
+      for (ConnectedComponent sourceCC : sourceCCs)
       {
-         ImageIO.write(toImage((BinaryImage)binReducedImage1, image), "png", out);
-         out.flush();
-      }
-
-      logger.info("Pass 2:");
-      reducer = new ThresholdReducer(binReducedImage1, 4, 3);
-      binReducedImage2 = reducer.run();
-      logger.info("binReducedImage2 size: " + binReducedImage2.getHeight() + "," + binReducedImage2.getWidth());
-      logger.info("======================");
-
-      /*
-       * logger.info("Pass 2.5:"); reducer = new ThresholdReducer(binReducedImage2, 4, 1); binReducedImageInter =
-       * reducer.run();
-       * logger.info("binReducedImage2 size: "+binReducedImageInter.getHeight()+","+binReducedImageInter.getWidth());
-       * logger.info("======================");
-       */
-
-      logger.info("Will run 4x1 Threshold reducer, T=4");
-      reducer = new ThresholdReducer(binReducedImage2, 4, 4);
-      binReducedImage3 = reducer.run();
-      logger.info("binReducedImage3 size: " + binReducedImage3.getHeight() + "," + binReducedImage3.getWidth());
-      logger.info("======================");
-
-      logger.info("Will run 4x1 Threshold reducer, T=3");
-      reducer = new ThresholdReducer(binReducedImage3, 4, 3);
-      binReducedImage4 = reducer.run();
-      logger.info("binReducedImage4 size: " + binReducedImage4.getHeight() + "," + binReducedImage4.getWidth());
-      logger.info("======================");
-
-      outputPath = dataDir.resolve("beforeOpening.png");
-      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
-      {
-         ImageIO.write(toImage((BinaryImage)binReducedImage2, image), "png", out);
-         out.flush();
+         if (sourceCC.getNumberOfPixels() < 5)
+            continue;
+//         ct++;
+         for (ConnectedComponent seedCC : seedComponents)    
+         {
+            if (seedCC.intersects(sourceCC))
+               union.add(sourceCC);
+         }
       }
       
-      dataDir = Paths.get("C:\\Users\\deepa.narayanan\\git\\citd.dia\\tests\\edu.tamu.tcat.dia.binarization.sauvola.test\\res\\output");
-      Path imagePath = dataDir.resolve("00000008-bin-reduced4.png");
-      if (!Files.exists(imagePath))
-         throw new IllegalArgumentException("Source image does not exist [" + imagePath + "]");
-      
-      String filename = imagePath.toString();
-      String dilatedFilename = "C:\\Users\\deepa.narayanan\\git\\citd.dia\\tests\\edu.tamu.tcat.dia.binarization.sauvola.test\\res\\output\\00000008-dilated.png";
-      String erodedFilename = "C:\\Users\\deepa.narayanan\\git\\citd.dia\\tests\\edu.tamu.tcat.dia.binarization.sauvola.test\\res\\output\\00000008-eroded.png";
-      
-      System.out.println("Will run opening with SE=5x5 element");
-      System.out.println("Eroding first");
-      ErosionOperator eroder = new ErosionOperator(filename, erodedFilename, null, null);
-      eroder.run();
-      
-      System.out.println("Dilating now");
-      BufferedImage input = ImageIO.read(Paths.get(erodedFilename).toFile());
-      BinaryImage bin = new ThresholdedBinaryImage(input, 100);
-      DilationOperator dilator = new DilationOperator(bin);
-      BinaryImage result = dilator.run();
-      ImageIO.write(BinaryImage.toBufferedImage(result, input), "png", Files.newOutputStream(Paths.get(dilatedFilename), StandardOpenOption.CREATE, StandardOpenOption.WRITE));
-      
-      //need binary image to run 
-      dataDir = Paths.get("C:\\Users\\deepa.narayanan\\git\\citd.dia\\tests\\edu.tamu.tcat.dia.binarization.sauvola.test\\res\\output");
-      imagePath = dataDir.resolve("00000008-dilated.png");
-      if (!Files.exists(imagePath))
-         throw new IllegalArgumentException("Source image does not exist [" + imagePath + "]");
-
-//      logger.info("Will run opening with SE=3x3 element");
-//      logger.info("Eroding first");
-//      ErosionOperator eroder = new ErosionOperator(binReducedImage4, 3);
-//      binEroded = eroder.run();
-//
-//      logger.info("Dilating now");
-//      DilationOperator dilator = new DilationOperator(binEroded, 3);
-//      binDilated = dilator.run();
-
-      outputPath = dataDir.resolve("afterOpening.png");
-      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
+      int w = initialReduction.getWidth();
+      int h = initialReduction.getHeight();
+      BooleanArrayBinaryImage result = new BooleanArrayBinaryImage(w, h);
+      for (ConnectedComponent cc : union)
       {
-         ImageIO.write(toImage((BinaryImage)binDilated, image), "png", out);
-         out.flush();
+         for (Point p : cc.getPoints())
+         {
+            result.setForeground(p.getY() * w + p.getX());
+         }
       }
+      
+      return result;
+//      System.out.println(ct);
+//      Integer pxCt = union.stream().map(cc -> cc.getNumberOfPixels()).reduce(0, (a, b) -> a.intValue() + b.intValue());
+//      System.out.println(pxCt);
+//      System.out.println(pxCt / (double)(intermediate.getWidth() * intermediate.getHeight()));
+//      
+//      System.out.println(union.size());
+   }
 
-      ExpansionOperator expander = new ExpansionOperator(binDilated, 4);
-      binExpandedImage1 = expander.run();
 
-      expander = new ExpansionOperator(binExpandedImage1, 4);
-      binExpandedImage2 = expander.run();
-
-      outputPath = dataDir.resolve("seed.png");
-      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
-      {
-         ImageIO.write(toImage((BinaryImage)binExpandedImage2, image), "png", out);
-         out.flush();
-      }
-
-      //binExpandedImage2 should have same size as image after first 2 passes of threshold reduction
-      logger.info("binExpandedImage2 size: " + binExpandedImage2.getHeight() + "," + binExpandedImage2.getWidth());
-      UnionOperator unionOp = new UnionOperator(binReducedImage2, binExpandedImage2, true);
-      unionImage = unionOp.run();
-
-      logger.info("Dilating using 3x3 SE");
-      dilator = new DilationOperator(unionImage, 3);
-      binDilated2 = dilator.run();
-
-      logger.info("Running 2 1x4 expansions");
-      expander = new ExpansionOperator(binDilated2, 4);
-      binExpandedImage3 = expander.run();
-
-      expander = new ExpansionOperator(binExpandedImage3, 4);
-      binExpandedImage4 = expander.run();
-
-      logger.info("Writing final image");
-      outputPath = dataDir.resolve("9-final.png");
-      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
-      {
-         ImageIO.write(toImage((BinaryImage)binExpandedImage4, image), "png", out);
-         out.flush();
-      }
-
-      assertTrue("", true);
+   private void writeImage(BinaryImage initialReduction, Path outputDir, String name) throws IOException
+   {
+      Path outputImagePath = outputDir.resolve(name + ".jpeg");
+      ImageIO.write(BinaryImage.toBufferedImage(initialReduction), "jpeg", outputImagePath.toFile());
    }
 }
