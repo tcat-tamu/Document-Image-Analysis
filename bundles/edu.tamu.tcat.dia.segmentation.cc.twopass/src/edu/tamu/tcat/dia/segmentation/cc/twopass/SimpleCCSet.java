@@ -2,6 +2,7 @@ package edu.tamu.tcat.dia.segmentation.cc.twopass;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 
 import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
@@ -12,11 +13,6 @@ public class SimpleCCSet implements ConnectComponentSet
    private final Map<Integer, SimpleCC> components;
    private final int width;
    private final int height;
-   
-//   public SimpleCCSet(Map<Integer, SimpleCC> components)
-//   {
-//      this.components = Collections.unmodifiableMap(components);
-//   }
    
    public SimpleCCSet(int w, int h, Map<Integer, SimpleCC> components)
    {
@@ -46,5 +42,34 @@ public class SimpleCCSet implements ConnectComponentSet
    public int getHeight()
    {
       return height;
+   }
+
+   @Override
+   public Iterator<ConnectedComponent> iterator()
+   {
+      return new IteratorImpl(components.values());
+   }
+   
+   private class IteratorImpl implements Iterator<ConnectedComponent>
+   {
+      private Iterator<SimpleCC> iterator;
+
+      public IteratorImpl(Collection<SimpleCC> collection)
+      {
+         iterator = collection.iterator();
+      }
+      
+      @Override
+      public boolean hasNext()
+      {
+         return iterator.hasNext();
+      }
+
+      @Override
+      public ConnectedComponent next()
+      {
+         return iterator.next();
+      }
+      
    }
 }
