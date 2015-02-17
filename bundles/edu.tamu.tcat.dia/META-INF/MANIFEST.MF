@@ -11,7 +11,5 @@ Export-Package: edu.tamu.tcat.analytics.image.integral,
  edu.tamu.tcat.dia,
  edu.tamu.tcat.dia.binarization,
  edu.tamu.tcat.dia.binarization.datatrax,
- edu.tamu.tcat.dia.datatrax,
  edu.tamu.tcat.dia.segmentation.cc
-Import-Package: edu.tamu.tcat.analytics.datatrax,
- edu.tamu.tcat.analytics.datatrax.basic.factorymeta
+Import-Package: edu.tamu.tcat.analytics.datatrax
