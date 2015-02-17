@@ -41,6 +41,15 @@ public class BufferedImageAdapter implements Transformer
    {
       Objects.requireNonNull(image, "Source image was null");
       
+      // HACK prevent 'java.awt.color.CMMException: LCMS error 13: Couldn't link the profiles' exceptions
+      //      See: http://stackoverflow.com/questions/26535842/multithreaded-jpeg-image-processing-in-java
+      try {
+         Class.forName("java.awt.color.ICC_ColorSpace");
+         Class.forName("sun.java2d.cmm.lcms.LCMS");
+      } catch (Exception ex) {
+         throw new IllegalStateException("Cannot load color models");
+      }
+      
       Raster data = image.getData();
       if (data.getNumBands() > 1)
       {
