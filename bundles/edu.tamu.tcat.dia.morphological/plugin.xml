@@ -31,6 +31,118 @@
             </input_pin>
          </inputs>
       </transformer>
+      <transformer
+            class="edu.tamu.tcat.dia.morphological.opencv.transformer.OpenCvDilationTransformer"
+            id="tcat.dia.morphological.opencv.dilation"
+            output_type="edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix"
+            title="Morphological Dilation (Open CV)">
+         <inputs>
+            <input_pin
+                  description="The binary source image as an OpenCV Mat data structure."
+                  label="image_matrix"
+                  required="true"
+                  type="edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix">
+            </input_pin>
+         </inputs>
+      </transformer>
+      <transformer
+            class="edu.tamu.tcat.dia.morphological.opencv.transformer.OpenCvErosionTransformer"
+            id="tcat.dia.morphological.opencv.erosion"
+            output_type="edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix"
+            title="Morphological Erosion (Open CV)">
+         <inputs>
+            <input_pin
+                  label="image_matrix"
+                  required="true"
+                  type="edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix">
+            </input_pin>
+         </inputs>
+      </transformer>
+      <transformer
+            class="edu.tamu.tcat.dia.morphological.opencv.transformer.OpenCvClosingTransformer"
+            id="tcat.dia.morphological.opencv.closing"
+            output_type="edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix"
+            title="Morphological Closing (OpenCV)">
+         <inputs>
+            <input_pin
+                  label="image_matrix"
+                  required="true"
+                  type="edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix">
+            </input_pin>
+         </inputs>
+      </transformer>
+      <transformer
+            class="edu.tamu.tcat.dia.morphological.opencv.transformer.OpenCvOpeningTransformer"
+            id="tcat.dia.morphological.opencv.opening"
+            output_type="edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix"
+            title="Morphological Opening (OpenCV)">
+         <inputs>
+            <input_pin
+                  label="image_matrix"
+                  required="true"
+                  type="edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix">
+            </input_pin>
+         </inputs>
+      </transformer>
+      <transformer
+            class="edu.tamu.tcat.dia.morphological.opencv.transformer.OpenCvGaussianBlurTransformer"
+            id="tcat.dia.morphological.opencv.gaussian_blur"
+            output_type="edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix"
+            title="Gaussian Blur (Open CV)">
+         <inputs>
+            <input_pin
+                  description="The soure image to be blurred."
+                  label="image_matrix"
+                  required="true"
+                  type="edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix">
+            </input_pin>
+         </inputs>
+      </transformer>
+      <transformer
+            class="edu.tamu.tcat.dia.segmentation.images.bloomberg.datatrax.BloombergUnionTransformer"
+            id="tcat.dia.seg.images.bloomberg"
+            output_type="edu.tamu.tcat.dia.binarization.BinaryImage"
+            title="Bloomberg Union Operation">
+         <inputs>
+            <input_pin
+                  label="source"
+                  required="true"
+                  type="edu.tamu.tcat.dia.binarization.BinaryImage">
+            </input_pin>
+            <input_pin
+                  label="seed"
+                  required="true"
+                  type="edu.tamu.tcat.dia.binarization.BinaryImage">
+            </input_pin>
+         </inputs>
+      </transformer>
+      <transformer
+            class="edu.tamu.tcat.dia.segmentation.images.bloomberg.datatrax.ExpansionTransformer"
+            id="tcat.dia.morphological.expansion"
+            output_type="edu.tamu.tcat.dia.binarization.BinaryImage"
+            title="Expansion Operator (1x4)">
+         <inputs>
+            <input_pin
+                  description="The input image to be expanded."
+                  label="binary_image"
+                  required="true"
+                  type="edu.tamu.tcat.dia.binarization.BinaryImage">
+            </input_pin>
+         </inputs>
+      </transformer>
+      <transformer
+            class="edu.tamu.tcat.dia.segmentation.images.bloomberg.datatrax.ThresholdReducerTransformer"
+            id="tcat.dia.morphological.thresholdreducer"
+            output_type="edu.tamu.tcat.dia.binarization.BinaryImage"
+            title="Threshold Reducer">
+         <inputs>
+            <input_pin
+                  label="binary"
+                  required="true"
+                  type="edu.tamu.tcat.dia.binarization.BinaryImage">
+            </input_pin>
+         </inputs>
+      </transformer>
    </extension>
 
 </plugin>
