@@ -17,16 +17,18 @@ import edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix;
 
 public class OpenCvGaussianBlurTransformer implements Transformer
 {
+   private static final Logger ERROR_LOGGER = Logger.getLogger(OpenCvGaussianBlurTransformer.class.getName());
 
-   private static final Logger ERROR_LOGGER = Logger.getAnonymousLogger("edu.tamu.tcat.dia.morphological.datatrax.errors");
-
-   public final static String EXTENSION_ID = "tcat.dia.morphological.opencv.gaussianBlur";
+   public final static String EXTENSION_ID = "tcat.dia.morphological.opencv.gaussian_blur";
    public static final String IMAGE_MATRIX_PIN = "image_matrix";
+   
    public static final String PARAM_SIGMA_X = "sigma_x";
    public static final String PARAM_SIGMA_Y = "sigma_y";
    public static final String PARAM_KERNEL_SIZE = "kernel_size";
-   protected int kernelSize;
-   protected double sigmaX, sigmaY;
+   
+   protected int kernelSize = 0;
+   protected double sigmaX = 0;
+   protected double sigmaY = 0;
 
    @Override
    public Map<String, Object> getConfiguration()
@@ -39,23 +41,16 @@ public class OpenCvGaussianBlurTransformer implements Transformer
    }
 
    @Override
-   public Callable<?> create(TransformerContext ctx)
+   public Callable<OpenCvMatrix> create(TransformerContext ctx)
    {
       final OpenCvMatrix input = (OpenCvMatrix)ctx.getValue(IMAGE_MATRIX_PIN);
-      return new Callable<OpenCvMatrix>()
-      {
-         @Override
-         public OpenCvMatrix call() throws Exception
-         {
-            Mat mat = input.get();
-            Mat dest = new Mat(mat.rows(), mat.cols(), mat.type());
-            Imgproc.GaussianBlur(mat, dest, new Size(kernelSize, kernelSize), sigmaX, sigmaY);
-            
-            return new OpenCvMatrix(dest);
+      return () -> {
+         Mat mat = input.get();
+         Mat dest = new Mat(mat.rows(), mat.cols(), mat.type());
+         Imgproc.GaussianBlur(mat, dest, new Size(kernelSize, kernelSize), sigmaX, sigmaY);
 
-         }
+         return new OpenCvMatrix(dest);
       };
-
    }
 
    @Override

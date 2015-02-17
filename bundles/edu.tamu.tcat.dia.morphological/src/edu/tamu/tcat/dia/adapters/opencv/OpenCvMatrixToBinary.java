@@ -15,7 +15,6 @@ import edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix;
 
 public class OpenCvMatrixToBinary implements Transformer
 {
-
    public final static String EXTENSION_ID = "tcat.dia.adapters.opencv.matrix2binary"; 
    public static final String IMAGE_MATRIX_PIN = "image_matrix";
 

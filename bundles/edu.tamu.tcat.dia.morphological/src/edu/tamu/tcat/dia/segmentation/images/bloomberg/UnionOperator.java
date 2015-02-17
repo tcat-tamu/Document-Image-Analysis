@@ -51,7 +51,7 @@ public final class UnionOperator {
 
    private static ConnectComponentSet findComponents(BinaryImage seed)
    {
-      Finder ccFinder = new Finder(seed, 10_000);
+      Finder ccFinder = new Finder(seed, 100_000);
       ConnectComponentSet seedComponents = ccFinder.call();
       return seedComponents;
    }

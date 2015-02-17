@@ -15,14 +15,13 @@ import edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix;
 
 public abstract class KernelBasedTransformer implements Transformer
 {
-   private static final Logger ERROR_LOGGER = Logger.getAnonymousLogger("edu.tamu.tcat.dia.morphological.datatrax.errors");
+   private static final Logger ERROR_LOGGER = Logger.getLogger(KernelBasedTransformer.class.getName());
    
    public static final String PARAM_KERNEL_SIZE = "kernel_size";
    protected int kernalSize;
 
    public KernelBasedTransformer()
    {
-      super();
    }
 
    @Override

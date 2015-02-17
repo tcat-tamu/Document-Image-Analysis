@@ -17,7 +17,7 @@ public class ThresholdReducerTransformer implements Transformer
    
    public static final String EXTENSION_ID = "tcat.dia.morphological.thresholdreducer";
    
-   /** The number of times this reduction should be performed. */
+   /** The number of foreground pixels required to result in an output pixel being set. */
    public static final String PARAM_T = "t";
    
    /** The number of times this reduction should be performed. */
