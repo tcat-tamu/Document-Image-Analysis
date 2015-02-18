@@ -5,152 +5,140 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 
 public final class RunLengthRatioGenerator
 {
-
-   private BinaryImage input;
-   private int numberOfRuns;
-   private Map<Integer, ArrayList<Float>> outMap;
    private final static Logger logger = Logger.getLogger("edu.tamu.tcat.dia.morph.rlgenerator");
 
-   public static <T> List<T> mode(List<? extends T> coll)
+//   public static <T> List<T> mode(List<? extends T> coll)
+//   {
+//      Map<T, Integer> seen = new HashMap<T, Integer>();
+//      int max = 0;
+//      List<T> maxElems = new ArrayList<T>();
+//      for (T value : coll)
+//      {
+//         if (seen.containsKey(value))
+//            seen.put(value, seen.get(value) + 1);
+//         else
+//            seen.put(value, 1);
+//         if (seen.get(value) > max)
+//         {
+//            max = seen.get(value);
+//            maxElems.clear();
+//            maxElems.add(value);
+//         }
+//         else if (seen.get(value) == max)
+//         {
+//            maxElems.add(value);
+//         }
+//      }
+//
+//      for (T e : maxElems)
+//      {
+//         logger.info("Value " + e + " occurs " + seen.get(e) + " times");
+//      }
+//      return maxElems;
+//   }
+//
+//   public RunLengthRatioGenerator()
+//   {
+//   }
+   
+   /**
+    * Calculates 
+    * @param input
+    * @param numberOfRuns
+    * @return
+    */
+   public static Map<Integer, Double> findRunLengthRatios(BinaryImage input, int numberOfRuns)
    {
-      Map<T, Integer> seen = new HashMap<T, Integer>();
-      int max = 0;
-      List<T> maxElems = new ArrayList<T>();
-      for (T value : coll)
-      {
-         if (seen.containsKey(value))
-            seen.put(value, seen.get(value) + 1);
-         else
-            seen.put(value, 1);
-         if (seen.get(value) > max)
-         {
-            max = seen.get(value);
-            maxElems.clear();
-            maxElems.add(value);
-         }
-         else if (seen.get(value) == max)
-         {
-            maxElems.add(value);
-         }
-      }
-
-      for (T e : maxElems)
-      {
-         logger.info("Value " + e + " occurs " + seen.get(e) + " times");
-      }
-      return maxElems;
-   }
-
-   public RunLengthRatioGenerator(BinaryImage source, int numRuns)
-   {
-      this.input = source;
-      this.numberOfRuns = numRuns;
-      this.outMap = new HashMap<Integer, ArrayList<Float>>(numRuns);
-   }
-
-   public Map<Integer, ArrayList<Float>> run()
-   {
+      Map<Integer, Double> outMap = new HashMap<>(numberOfRuns);
+      
       Random randomGen = new Random();
       int numCols = input.getWidth();
-      int randColIndex;
-      int runLength = 0;
-      ArrayList<Object> colList = new ArrayList<Object>();
-      ArrayList<Float> ratioList = new ArrayList<Float>();
 
+      // for each run
       for (int i = 0; i < numberOfRuns; i++)
       {
-         // randomly pick a column, count number of black and white pixels in
-         // a row and sum numbers up
-         // calculate pairwise white:black ratios
+         int colIx = selectColumn(randomGen, numCols, outMap.keySet());
 
-         colList = new ArrayList<Object>();
-         randColIndex = randomGen.nextInt(numCols);
-         if (outMap.size() > 0)
-         {
-            while (outMap.containsKey(randColIndex))
-            {
-               randColIndex = randomGen.nextInt(numCols);
-            }
-         }
-         logger.finest("Processing col " + randColIndex);
-
-         for (int j = 0; j < input.getHeight(); j++)
-         {
-            runLength = 1;
-            if (input.isForeground(randColIndex, j))
-            {
-               colList.add('B');
-               while ((j + 1 < input.getHeight())
-                     && ((input.isForeground(randColIndex, j) && input
-                           .isForeground(randColIndex, j + 1))))
-               {
-                  runLength++;
-                  j++;
-               }
-               colList.add(runLength);
-
-            }
-            else if (!input.isForeground(randColIndex, j))
-            {
-               colList.add('W');
-               while ((j + 1 < input.getHeight())
-                     && ((!input.isForeground(randColIndex, j) && !input
-                           .isForeground(randColIndex, j + 1))))
-               {
-                  runLength++;
-                  j++;
-               }
-               colList.add(runLength);
-
-            }
-         }
-
-         // compute ratios in colLists
-         ratioList = new ArrayList<Float>();
-         if ((char)colList.get(0) == 'W')
-         {
-            for (int k = 1; (k + 2) < colList.size(); k += 4)
-            {
-               ratioList.add((float)((int)colList.get(k))
-                     / (int)colList.get(k + 2));
-            }
-         }
-         else if ((char)colList.get(0) == 'B')
-         {
-            // ignore the first black entries, start with white
-            for (int k = 3; (k + 2) < colList.size(); k += 4)
-            {
-               ratioList.add((float)((int)colList.get(k))
-                     / (int)colList.get(k + 2));
-            }
-         }
-
-         logger.finest("ratio list length: " + ratioList.size() + ", "
-               + ratioList.toString());
-         if (ratioList.isEmpty())
-         {
-            outMap.put(randColIndex, new ArrayList<Float>());
-            logger.finest("Adding empty list to output at index " + i);
-         }
-         else
-         {
-            System.out.println("Adding list to output at index " + i);
-            outMap.put(randColIndex, ratioList);
-         }
-
+         List<PixelRun> runs = findRuns(input, colIx);
+         double foregroundRatio = computeForegroundRatio(runs);
+         
+         outMap.put(Integer.valueOf(colIx), Double.valueOf(foregroundRatio));
       }
 
-      for (Integer e : outMap.keySet())
-      {
-         logger.fine("Mode for key " + e + " is " + mode(outMap.get(e)));
-      }
       return outMap;
+   }
+
+   private static double computeForegroundRatio(List<PixelRun> runs)
+   {
+      // compute the average ratio of background (white) to foreground pixels)
+      
+      List<Double> ratios = new ArrayList<>();
+      int startIx = runs.get(0).foreground ? 1 : 0;
+      for (int i = startIx; i < runs.size() - 1; i += 2)
+      {
+         double ratio = runs.get(i).ct / (double) runs.get(i + 1).ct;
+         ratios.add(Double.valueOf(ratio));
+      }
+      
+      // TODO for now, just use the average, eventually should through out abnormal values 
+      //      and/or find groupings of related values
+      double sum =  ratios.parallelStream()
+                     .reduce(Double::sum)
+                     .orElse(Double.valueOf(0)); 
+      return sum / ratios.size();
+   }
+
+   private static List<PixelRun> findRuns(BinaryImage input, int colIx)
+   {
+      int h = input.getHeight();
+      List<PixelRun> runs = new ArrayList<>();
+      boolean previous = input.isForeground(colIx, 0);
+      PixelRun run = new PixelRun(previous);
+      run.ct++;
+      for (int j = 1; j < h; j++)
+      {
+         boolean current = input.isForeground(colIx, j);
+         if (previous != current) {
+            runs.add(run);
+            run = new PixelRun(current);
+         }
+         
+         run.ct++;
+      }
+      return runs;
+   }
+   
+   private static int selectColumn(Random randomGen, int max, Set<Integer> previous)
+   {
+      int colIx = -1;
+      do {
+         colIx = randomGen.nextInt(max);
+         
+      } while (previous.contains(Integer.valueOf(colIx)));
+         
+      logger.finest("Processing col " + colIx);
+      return colIx;
+   }
+
+   private static class PixelRun
+   {
+      /** true if this is a run of foreground pixels. */
+      private final boolean foreground;
+      
+      /** the number of pixels in the run. */
+      int ct = 0;
+      
+      public PixelRun(boolean foreground)
+      {
+         this.foreground = foreground;
+      }
    }
 
 }
