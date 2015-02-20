@@ -1,6 +1,7 @@
-package edu.tamu.tcat.dia.morphological;
+package edu.tamu.tcat.dia.classifier.music.runlength;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,40 +10,13 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import edu.tamu.tcat.dia.binarization.BinaryImage;
+import edu.tamu.tcat.dia.classifier.music.runlength.EM.Cluster;
 
 public final class RunLengthRatioGenerator
 {
    private final static Logger logger = Logger.getLogger("edu.tamu.tcat.dia.morph.rlgenerator");
 
-//   public static <T> List<T> mode(List<? extends T> coll)
-//   {
-//      Map<T, Integer> seen = new HashMap<T, Integer>();
-//      int max = 0;
-//      List<T> maxElems = new ArrayList<T>();
-//      for (T value : coll)
-//      {
-//         if (seen.containsKey(value))
-//            seen.put(value, seen.get(value) + 1);
-//         else
-//            seen.put(value, 1);
-//         if (seen.get(value) > max)
-//         {
-//            max = seen.get(value);
-//            maxElems.clear();
-//            maxElems.add(value);
-//         }
-//         else if (seen.get(value) == max)
-//         {
-//            maxElems.add(value);
-//         }
-//      }
-//
-//      for (T e : maxElems)
-//      {
-//         logger.info("Value " + e + " occurs " + seen.get(e) + " times");
-//      }
-//      return maxElems;
-//   }
+ 
 //
 //   public RunLengthRatioGenerator()
 //   {
@@ -54,9 +28,9 @@ public final class RunLengthRatioGenerator
     * @param numberOfRuns
     * @return
     */
-   public static Map<Integer, Double> findRunLengthRatios(BinaryImage input, int numberOfRuns)
+   public static Map<Integer, Set<Cluster>> findRunLengthRatios(BinaryImage input, int numberOfRuns)
    {
-      Map<Integer, Double> outMap = new HashMap<>(numberOfRuns);
+      Map<Integer, Set<Cluster>> outMap = new HashMap<>(numberOfRuns);
       
       Random randomGen = new Random();
       int numCols = input.getWidth();
@@ -67,19 +41,22 @@ public final class RunLengthRatioGenerator
          int colIx = selectColumn(randomGen, numCols, outMap.keySet());
 
          List<PixelRun> runs = findRuns(input, colIx);
-         double foregroundRatio = computeForegroundRatio(runs);
+         Set<Cluster> clusteredRatios = computeForegroundRatio(runs);
          
-         outMap.put(Integer.valueOf(colIx), Double.valueOf(foregroundRatio));
+         outMap.put(Integer.valueOf(colIx), clusteredRatios);
       }
 
       return outMap;
    }
 
-   private static double computeForegroundRatio(List<PixelRun> runs)
+   private static Set<Cluster> computeForegroundRatio(List<PixelRun> runs)
    {
       // compute the average ratio of background (white) to foreground pixels)
       
       List<Double> ratios = new ArrayList<>();
+      if (runs.isEmpty())
+         return Collections.emptySet();
+      
       int startIx = runs.get(0).foreground ? 1 : 0;
       for (int i = startIx; i < runs.size() - 1; i += 2)
       {
@@ -87,12 +64,8 @@ public final class RunLengthRatioGenerator
          ratios.add(Double.valueOf(ratio));
       }
       
-      // TODO for now, just use the average, eventually should through out abnormal values 
-      //      and/or find groupings of related values
-      double sum =  ratios.parallelStream()
-                     .reduce(Double::sum)
-                     .orElse(Double.valueOf(0)); 
-      return sum / ratios.size();
+      EM estimator = new EM(ratios, 3);
+      return estimator.estimate();
    }
 
    private static List<PixelRun> findRuns(BinaryImage input, int colIx)
@@ -108,6 +81,7 @@ public final class RunLengthRatioGenerator
          if (previous != current) {
             runs.add(run);
             run = new PixelRun(current);
+            previous = current;
          }
          
          run.ct++;
