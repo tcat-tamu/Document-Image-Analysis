@@ -143,6 +143,20 @@
             </input_pin>
          </inputs>
       </transformer>
+      <transformer
+            class="edu.tamu.tcat.dia.classifier.music.runlength.RunLengthRatioTransformer"
+            id="tcat.dia.music.runlength"
+            output_type="java.util.Map"
+            title="Run Length Ratio">
+         <inputs>
+            <input_pin
+                  description="The image from which run lengths will be extracted."
+                  label="binary_image"
+                  required="true"
+                  type="edu.tamu.tcat.dia.binarization.BinaryImage">
+            </input_pin>
+         </inputs>
+      </transformer>
    </extension>
 
 </plugin>
