@@ -1,10 +1,9 @@
 package edu.tamu.tcat.dia.segmentation.cc.twopass;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
@@ -80,48 +79,36 @@ public class CCWriter implements Transformer
    public Callable<BufferedImage> create(TransformerContext ctx)
    {
       final ConnectComponentSet components = (ConnectComponentSet)ctx.getValue(CONNECTED_COMPONENTS_PIN);
-      final BufferedImage modelImage = (BufferedImage)ctx.getValue(MODEL_PIN);
-
-      return new Callable<BufferedImage>()
-      {
-         @Override
-         public BufferedImage call()
-         {
-            return render(components, modelImage, colorMap);
-         }
-      };
+      int w = components.getWidth();
+      int h = components.getHeight();
+      return () -> render(components.asSet(), w, h, colorMap);
    }
 
-   private static BufferedImage render(ConnectComponentSet components, BufferedImage model, int[][] colorMap) {
-      int width = components.getWidth();
-      int height = components.getHeight();
-
-      ColorModel colorModel = model.getColorModel();
-      WritableRaster raster = colorModel.createCompatibleWritableRaster(width, height);
-      int bands = colorModel.getNumColorComponents();
-      for (int r = 0; r < height; r++)  {
-         for (int c = 0; c < width; c++) {
-            for (int b = 0; b < bands; b++) {
-               raster.setSample(c, r, b, 255);
-            }
-         }
-      }
-
-      int cIx = 0;
-      for (Integer label : components.listLabels())
-      {
-         ConnectedComponent cc = components.get(label.intValue());
-         BoundingBox box = cc.getBounds();
-         if (box.getWidth() > 150 || box.getHeight() > 60 || cc.getNumberOfPixels() < 10)
-            continue;
-         write(cc, raster, colorMap[cIx]);
-         cIx = cIx < colorMap.length - 1 ? cIx + 1 : 0;
-      }
-
-      return new BufferedImage(colorModel, raster, true, new Hashtable<>());
+   public static BufferedImage render(ConnectComponentSet components) {
+      return render(components.asSet(), components.getWidth(), components.getHeight(), DEFAULT_COLOR_MAP);
    }
    
-   private static void write(ConnectedComponent cc, WritableRaster raster, int[] color)
+   public static BufferedImage render(Collection<ConnectedComponent> components, int width, int height) 
+   {
+      return render(components, width, height, DEFAULT_COLOR_MAP);
+   }
+   
+   public static BufferedImage render(Collection<ConnectedComponent> components, int width, int height, int[][] colorMap) 
+   {
+//      int width = components.getWidth();
+//      int height = components.getHeight();
+
+      BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+      WritableRaster raster = image.getRaster();      // TODO use a Graphics2D?
+
+      initializeBackground(raster);
+      writeComponents(components, colorMap, raster);
+      image.flush();
+      
+      return image;
+   }
+
+   public static void write(ConnectedComponent cc, WritableRaster raster, int[] color)
    {
       int bands = color.length;
       Objects.requireNonNull(cc, "CC was null");
@@ -129,6 +116,38 @@ public class CCWriter implements Transformer
       {
          for (int b = 0; b < bands; b++) {
             raster.setSample(point.getX(), point.getY(), b, color[b]);
+         }
+      }
+   }
+
+   private static void writeComponents(Collection<ConnectedComponent> components, int[][] colorMap, WritableRaster raster)
+   {
+      int cIx = 0;
+      for (ConnectedComponent cc : components)
+      {
+         write(cc, raster, colorMap[cIx]);
+         cIx = cIx < colorMap.length - 1 ? cIx + 1 : 0;
+      }
+   }
+
+   private static void initializeBackground(WritableRaster raster)
+   {
+      int width = raster.getWidth();
+      int height = raster.getHeight();
+      
+      // TODO seems like there should be a faster/better way to do this.
+      // should investigate the following
+//      int[] rgbArray = new int[width * height];
+//      Arrays.fill(rgbArray, 0xFFFFFFFF);
+//      image.setRGB(0, 0, width, height, rgbArray, 0, width);
+
+      // set to white background
+      int bands = raster.getNumBands();
+      for (int r = 0; r < height; r++)  {
+         for (int c = 0; c < width; c++) {
+            for (int b = 0; b < bands; b++) {
+               raster.setSample(c, r, b, 255);
+            }
          }
       }
    }
