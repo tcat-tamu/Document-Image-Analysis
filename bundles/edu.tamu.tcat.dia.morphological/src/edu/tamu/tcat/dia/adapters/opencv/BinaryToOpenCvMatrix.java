@@ -55,23 +55,32 @@ public class BinaryToOpenCvMatrix implements Transformer
       return imageByteArray;
    }
    
+   public static OpenCvMatrix toOpenCvMatrix(BinaryImage im)
+   {
+      try 
+      {
+         Mat matrix = new Mat(im.getHeight(), im.getWidth(), CvType.CV_8U);
+         matrix.put(0, 0, toByteArray(im));
+
+         return new OpenCvMatrix(matrix);
+      } 
+      catch (Exception ex)
+      {
+         System.err.println(ex);
+         // HACK figure out what to throw here.
+         throw new IllegalStateException(ex);
+      }
+   }
+   
    @Override
    public Callable<OpenCvMatrix> create(TransformerContext ctx)
    {
-      final BinaryImage im = (BinaryImage)ctx.getValue(BINARY_IMAGE_PIN);
-      return () -> {
-         try 
-         {
-            Mat matrix = new Mat(im.getHeight(), im.getWidth(), CvType.CV_8U);
-            matrix.put(0, 0, toByteArray(im));
-
-            return new OpenCvMatrix(matrix);
-         } 
-         catch (Throwable t)
-         {
-            System.err.println(t);
-            throw t;
-         }
+      return () -> 
+      {
+         BinaryImage im = (BinaryImage)ctx.getValue(BINARY_IMAGE_PIN);
+         OpenCvMatrix openCvMatrix = toOpenCvMatrix(im);
+         // ctx.close();
+         return openCvMatrix;
       };
    }
 }

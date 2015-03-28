@@ -34,7 +34,7 @@ public class OpenCvMatrixToBinary implements Transformer
       return new HashMap<>();
    }
    
-   private BinaryImage adapt(Mat srcMat)
+   public static BinaryImage adapt(Mat srcMat)
    {
       int srcSize = srcMat.cols() * srcMat.rows();
       BooleanArrayBinaryImage output = new BooleanArrayBinaryImage(srcMat.cols(), srcMat.rows());
