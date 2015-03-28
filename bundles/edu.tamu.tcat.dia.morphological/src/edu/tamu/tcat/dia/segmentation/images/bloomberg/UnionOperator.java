@@ -5,7 +5,7 @@ import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.BooleanArrayBinaryImage;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectedComponent;
-import edu.tamu.tcat.dia.segmentation.cc.twopass.Finder;
+import edu.tamu.tcat.dia.segmentation.cc.twopass.ConnectedComponentFinder;
 
 /**
  * Generates a halftone mask image used to locat illustrations within a document image.
@@ -51,7 +51,7 @@ public final class UnionOperator {
 
    private static ConnectComponentSet findComponents(BinaryImage seed)
    {
-      Finder ccFinder = new Finder(seed, 100_000);
+      ConnectedComponentFinder ccFinder = new ConnectedComponentFinder(seed, 100_000);
       ConnectComponentSet seedComponents = ccFinder.call();
       return seedComponents;
    }
