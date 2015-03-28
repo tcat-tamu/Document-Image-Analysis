@@ -52,7 +52,7 @@ public class UnionFind {
      * 
      * @return The id for the newly created element.
      */
-    int makeSet()
+    public int makeSet()
     {
  	   label++;
  	   count++;
