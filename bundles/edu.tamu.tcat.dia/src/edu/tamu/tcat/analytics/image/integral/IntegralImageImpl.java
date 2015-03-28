@@ -10,12 +10,32 @@
  */
 package edu.tamu.tcat.analytics.image.integral;
 
+import java.awt.color.ColorSpace;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.awt.image.Raster;
+import java.util.Objects;
 
 /**
  */
 public final class IntegralImageImpl implements IntegralImage
 {
+   
+   public static IntegralImage create(BufferedImage image)
+   {
+      Objects.requireNonNull(image, "Source image was null");
+      
+      if (image.getRaster().getNumBands() > 1)
+      {
+         // convert to grayscale.
+         ColorSpace colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
+         ColorConvertOp op = new ColorConvertOp(colorSpace, null);
+         image = op.filter(image, null);
+      }
+      
+      return IntegralImageImpl.create(image.getRaster());
+   }
+   
    /**
     * 
     * @param data The image to be represented as an {@link IntegralImage}. Note that this must 
