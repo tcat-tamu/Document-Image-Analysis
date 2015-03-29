@@ -1,16 +1,16 @@
 package edu.tamu.tcat.dia.classifier.music.runlength;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import edu.tamu.tcat.dia.binarization.BinaryImage;
-import edu.tamu.tcat.dia.classifier.music.runlength.EM.Cluster;
 
 public final class RunLengthRatioGenerator
 {
@@ -28,44 +28,83 @@ public final class RunLengthRatioGenerator
     * @param numberOfRuns
     * @return
     */
-   public static Map<Integer, Set<Cluster>> findRunLengthRatios(BinaryImage input, int numberOfRuns)
+   public static List<RunLengthStruct> findRunLengthRatios(BinaryImage input, int numberOfRuns)
    {
-      Map<Integer, Set<Cluster>> outMap = new HashMap<>(numberOfRuns);
-      
       Random randomGen = new Random();
       int numCols = input.getWidth();
 
       // for each run
+      Set<Integer> previous = new HashSet<>();
+      List<RunLengthStruct> results = new ArrayList<>();
       for (int i = 0; i < numberOfRuns; i++)
       {
-         int colIx = selectColumn(randomGen, numCols, outMap.keySet());
-
-         List<PixelRun> runs = findRuns(input, colIx);
-         Set<Cluster> clusteredRatios = computeForegroundRatio(runs);
+         RunLengthStruct runLengths = new RunLengthStruct();
+         runLengths.colIx = selectColumn(randomGen, numCols, previous);
+         previous.add(Integer.valueOf(runLengths.colIx));
          
-         outMap.put(Integer.valueOf(colIx), clusteredRatios);
+         runLengths.runs = findRuns(input, runLengths.colIx);
+         runLengths.ratios = computeForegroundRatio(runLengths.runs);
+         runLengths.mode = computeMode(runLengths.ratios);
+         
+         results.add(runLengths);
       }
 
-      return outMap;
+      return results;
    }
 
-   private static Set<Cluster> computeForegroundRatio(List<PixelRun> runs)
+   public static class RunLengthStruct 
+   {
+      int colIx;
+      List<PixelRun> runs;
+      List<Double> ratios;
+      int mode;
+   }
+   
+   private static List<Double> computeForegroundRatio(List<PixelRun> runs)
    {
       // compute the average ratio of background (white) to foreground pixels)
-      
-      List<Double> ratios = new ArrayList<>();
-      if (runs.isEmpty())
-         return Collections.emptySet();
-      
       int startIx = runs.get(0).foreground ? 1 : 0;
+      List<Double> ratios = new ArrayList<>();
       for (int i = startIx; i < runs.size() - 1; i += 2)
       {
          double ratio = runs.get(i).ct / (double) runs.get(i + 1).ct;
          ratios.add(Double.valueOf(ratio));
       }
       
-      EM estimator = new EM(ratios, 3);
-      return estimator.estimate();
+      return ratios;
+   }
+   
+   private static int computeMode(List<Double> runLengthRatios) 
+   {
+      // TODO find the mode
+      Map<Integer, AtomicInteger> accumulator = new HashMap<>();
+      for (double v : runLengthRatios)
+      {
+         Integer ix = Integer.valueOf((int)Math.round(v));
+         if (!accumulator.containsKey(ix))
+            accumulator.put(ix, new AtomicInteger());
+         
+         accumulator.get(ix).incrementAndGet();
+      }
+      
+      int mode = 0;
+      int maxValue = Integer.MIN_VALUE;
+      for (Integer ratio : accumulator.keySet())
+      {
+         int ct = accumulator.get(ratio).get();
+         if (ct > maxValue)
+         {
+            maxValue = ct;
+            mode = ratio.intValue();
+         }
+      };
+      
+      return mode;
+      
+//      // find the mode of ratios
+//      EM estimator = new EM(ratios, 3);
+//      estimator.
+//      return estimator.estimate();
    }
 
    private static List<PixelRun> findRuns(BinaryImage input, int colIx)
