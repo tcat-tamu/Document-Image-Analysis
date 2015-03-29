@@ -12,10 +12,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,8 +27,8 @@ import org.junit.Test;
 import edu.tamu.tcat.analytics.image.integral.IntegralImageImpl;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.sauvola.FastSauvolaBinarizer;
-import edu.tamu.tcat.dia.morphological.RunLengthRatioGenerator;
-import edu.tamu.tcat.dia.segmentation.images.bloomberg.ThresholdReducer;
+import edu.tamu.tcat.dia.classifier.music.runlength.RunLengthRatioGenerator;
+import edu.tamu.tcat.dia.classifier.music.runlength.RunLengthRatioGenerator.RunLengthStruct;
 
 public class RLGeneratorTest
 {
@@ -68,12 +67,13 @@ public class RLGeneratorTest
       return new BufferedImage(colorModel, raster, true, new Hashtable<>());
    }
    
-   @SuppressWarnings("unused")
    @Before
    public void setup() throws IOException
    {
-      dataDir = Paths.get("C:\\Projects\\VisualPage\\");
-      Path imagePath = dataDir.resolve("bach-sonata-1.png");
+      dataDir = Paths.get("I:\\Projects\\HathiTrust WCSA\\WCSA initial small dataset\\39015049753844");
+      Path imagePath = dataDir.resolve("00000027.tif");
+//      dataDir = Paths.get("I:\\Projects\\HathiTrust WCSA\\WCSA initial small dataset\\ark+=13960=t00z72x8w");
+//      Path imagePath = dataDir.resolve("00000027.jp2");
       if (!Files.exists(imagePath))
          throw new IllegalArgumentException("Source image does not exist [" + imagePath + "]");
 
@@ -91,19 +91,25 @@ public class RLGeneratorTest
    public void testRLRatioGenerator() throws IOException
    {
 
-      Path outputPath = dataDir.resolve("bach-sonata-bin.png");
-      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
+//      Path outputPath = dataDir.resolve("bach-sonata-bin.png");
+//      try (OutputStream out = Files.newOutputStream(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE))
+//      {
+//         ImageIO.write(toImage((BinaryImage)binImage, image), "png", out);
+//         out.flush();
+//      }
+      
+//      Map<Integer, ArrayList<Float>> rlratio; 
+      List<RunLengthStruct> ratios = RunLengthRatioGenerator.findRunLengthRatios(binImage, 5);
+//      RunLengthRatioGenerator rlgenerator = new RunLengthRatioGenerator(binImage, 5);
+//      rlratio = rlgenerator.run();
+      for (RunLengthStruct rl : ratios)
       {
-         ImageIO.write(toImage((BinaryImage)binImage, image), "png", out);
-         out.flush();
+         System.out.print(rl.mode + ", ");
       }
-      
-      Map<Integer, ArrayList<Float>> rlratio; 
-      RunLengthRatioGenerator rlgenerator = new RunLengthRatioGenerator(binImage, 5);
-      rlratio = rlgenerator.run();
-      System.out.println("keys: "+rlratio.keySet());
-      System.out.println("values: "+rlratio.values());
-      
+      System.out.println();
+//      System.out.println("keys: "+rlratio.keySet());
+//      System.out.println("values: "+rlratio.values());
+//      
       /*for(int i=0;i<rlratio.size();i++){
     	  
     	  if(rlratio.get(i) == Collections.EMPTY_LIST)

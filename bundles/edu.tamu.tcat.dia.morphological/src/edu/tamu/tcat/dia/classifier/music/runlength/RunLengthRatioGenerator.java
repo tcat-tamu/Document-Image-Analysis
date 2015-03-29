@@ -43,8 +43,17 @@ public final class RunLengthRatioGenerator
          previous.add(Integer.valueOf(runLengths.colIx));
          
          runLengths.runs = findRuns(input, runLengths.colIx);
-         runLengths.ratios = computeForegroundRatio(runLengths.runs);
-         runLengths.mode = computeMode(runLengths.ratios);
+         if (runLengths.runs.size() <= 1)
+         {
+            // all white or black pixels
+            runLengths.ratios = new ArrayList<>();
+            runLengths.mode = 0;
+         }
+         else 
+         {
+            runLengths.ratios = computeForegroundRatio(runLengths.runs);
+            runLengths.mode = computeMode(runLengths.ratios);
+         }
          
          results.add(runLengths);
       }
@@ -54,10 +63,10 @@ public final class RunLengthRatioGenerator
 
    public static class RunLengthStruct 
    {
-      int colIx;
-      List<PixelRun> runs;
-      List<Double> ratios;
-      int mode;
+      public int colIx;
+      public List<PixelRun> runs;
+      public List<Double> ratios;
+      public int mode;
    }
    
    private static List<Double> computeForegroundRatio(List<PixelRun> runs)
@@ -125,6 +134,7 @@ public final class RunLengthRatioGenerator
          
          run.ct++;
       }
+      runs.add(run);
       return runs;
    }
    
