@@ -1,15 +1,15 @@
 package edu.tamu.tcat.dia.classifier.music.runlength;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
-import edu.tamu.tcat.dia.classifier.music.runlength.EM.Cluster;
+import edu.tamu.tcat.dia.classifier.music.runlength.RunLengthRatioGenerator.RunLengthStruct;
 
 public class RunLengthRatioTransformer implements Transformer
 {
@@ -49,12 +49,11 @@ public class RunLengthRatioTransformer implements Transformer
    }
 
    @Override
-   public Callable<Map<Integer, Set<Cluster>>> create(TransformerContext ctx)
+   public Callable<List<RunLengthStruct>> create(TransformerContext ctx)
    {
-      // HACK: Map<Integer, Set<Cluster>>
       return () -> {
          BinaryImage input = (BinaryImage)ctx.getValue(BINARY_IMAGE_PIN);
-         Map<Integer, Set<Cluster>> runLengthRatios = RunLengthRatioGenerator.findRunLengthRatios(input, iterations);
+         List<RunLengthStruct> runLengthRatios = RunLengthRatioGenerator.findRunLengthRatios(input, iterations);
          return runLengthRatios;
       };
    }
