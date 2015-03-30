@@ -8,20 +8,18 @@ import org.opencv.imgproc.Imgproc;
 import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix;
 
-public class OpenCvErosionTransformer extends KernelBasedTransformer 
+public class OpenCvClosingTransformer extends KernelBasedTransformer 
 {
-   public final static String EXTENSION_ID = "tcat.dia.morphological.opencv.erosion"; 
+   public final static String EXTENSION_ID = "tcat.dia.morphological.opencv.closing"; 
    public static final String IMAGE_MATRIX_PIN = "image_matrix";
    
-   public OpenCvErosionTransformer()
+   public OpenCvClosingTransformer()
    {
    }
    
    @Override
    public Callable<OpenCvMatrix> create(TransformerContext ctx)
    {
-      // FIXME input may have been disposed.
-      
       final OpenCvMatrix input = (OpenCvMatrix)ctx.getValue(IMAGE_MATRIX_PIN);
       return new Callable<OpenCvMatrix>()
       {

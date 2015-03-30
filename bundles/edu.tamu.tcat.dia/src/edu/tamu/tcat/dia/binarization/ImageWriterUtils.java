@@ -1,4 +1,4 @@
-package edu.tamu.tcat.dia.datatrax;
+package edu.tamu.tcat.dia.binarization;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -10,9 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 import javax.imageio.ImageIO;
-
-import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
-import edu.tamu.tcat.dia.binarization.BinaryImage;
 
 /**
  * Utility methods that support adapters whose purpose is to write data to an image file. 
@@ -26,10 +23,10 @@ public final class ImageWriterUtils
     * 
     * @param path The path that the image will be written to
     * @return The supplied path
-    * @throws TransformerConfigurationException If the path is not suitable or cannot be made
+    * @throws IOException If the path is not suitable or cannot be made
     *       available for writing.
     */
-   public static Path processOutputImagePath(Path path) throws TransformerConfigurationException
+   public static Path processOutputImagePath(Path path) throws IOException
    {
       Path parent = path.getParent();
       if (!Files.exists(parent))
@@ -40,13 +37,13 @@ public final class ImageWriterUtils
          }
          catch (IOException e)
          {
-            throw new TransformerConfigurationException("Invalid output path. Cannot create parent directory [" + parent + "]");
+            throw new IOException("Invalid output path. Cannot create parent directory [" + parent + "]");
          }
       }
       
       if (!Files.isDirectory(parent) || !Files.isWritable(parent))
       {
-         throw new TransformerConfigurationException("Output path parent [" + parent + "] must be a writeable diretory ");
+         throw new IOException("Output path parent [" + parent + "] must be a writeable diretory ");
       }
       
       if (Files.exists(path))
@@ -57,7 +54,7 @@ public final class ImageWriterUtils
          }
          catch (IOException e)
          {
-            throw new TransformerConfigurationException("Invalid output path. Cannot delete existing file [" + path + "]");
+            throw new IOException("Invalid output path. Cannot delete existing file [" + path + "]");
          }
       }
          
@@ -72,7 +69,7 @@ public final class ImageWriterUtils
     *       using the supplied format. 
     * 
     */
-   public static String checkFormat(String format) throws TransformerConfigurationException
+   public static String checkFormat(String format) throws IOException
    {
       for (String fmt : ImageIO.getWriterFormatNames())
       {
@@ -82,7 +79,7 @@ public final class ImageWriterUtils
          }
       }
       
-      throw new TransformerConfigurationException("Invalid image format [" + format + "]");
+      throw new IOException("Invalid image format [" + format + "]");
    }
 
    

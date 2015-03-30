@@ -49,6 +49,6 @@ public class CCAnalyzer implements Transformer
    @Override
    public Callable<ConnectComponentSet> create(TransformerContext ctx)
    {
-      return new Finder((BinaryImage)ctx.getValue(BINARY_IMAGE_PIN), maxLables);
+      return new ConnectedComponentFinder((BinaryImage)ctx.getValue(BINARY_IMAGE_PIN), maxLables);
    }
 }

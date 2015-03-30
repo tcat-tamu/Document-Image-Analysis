@@ -6,33 +6,34 @@ import edu.tamu.tcat.dia.binarization.BooleanArrayBinaryImage;
 
 public final class FastSauvolaBinarizer
 {
-   private final int width;
-   private final int height;
+//   private final int width;
+//   private final int height;
    
-   private final int ts;        // tile size
-   private final int whalf;   // half the window size
+//   private final int ts;        // tile size
+//   private final int whalf;   // half the window size
    private final double k;      //
-   private int    range  = 128;     // control for dynamic range
+   private int range  = 128;     // control for dynamic range
    
-   BooleanArrayBinaryImage  output;
+//   BooleanArrayBinaryImage  output;
    private IntegralImage input;
+   private int windowSize;
    
    public FastSauvolaBinarizer(IntegralImage source, int windowSize, double k)
    {
       this.input = source;
-      
-      this.width = source.getWidth();
-      this.height = source.getHeight();
-      
-      this.output = new BooleanArrayBinaryImage(width, height);
-      
-      this.ts = (windowSize > 0) ? windowSize : width / 15; 
-      this.whalf = this.ts / 2;
+      this.windowSize = windowSize;
       this.k = k;
    }
    
    public BinaryImage run()
    {
+      int width = input.getWidth();
+      int height = input.getHeight();
+      BooleanArrayBinaryImage output = new BooleanArrayBinaryImage(width, height);
+      
+      int ts = (windowSize > 0) ? windowSize : width / 15; 
+      int whalf = ts / 2;
+
       int offset = 0;
       for (int rowIx = 0; rowIx < height; rowIx++) {
          for (int colIx = 0; colIx < width; colIx++) 

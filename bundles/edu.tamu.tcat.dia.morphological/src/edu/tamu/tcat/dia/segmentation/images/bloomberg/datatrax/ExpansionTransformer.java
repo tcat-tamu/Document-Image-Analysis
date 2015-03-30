@@ -15,17 +15,38 @@ public class ExpansionTransformer implements Transformer
    public final static String EXTENSION_ID = "tcat.dia.morphological.expansion"; 
    public static final String BINARY_IMAGE_PIN = "binary_image";
 
-   @Override
-   public void configure(Map<String, Object> data) throws TransformerConfigurationException
+   /** The number of times this reduction should be performed. */
+   public static final String PARAM_ITERATIONS = "iterations";
+   
+   private int iterations = 1;
+   
+   public void setNumberOfIterations(int iterations) throws TransformerConfigurationException
    {
+      if (iterations < 1)
+         throw new TransformerConfigurationException("Invalid number of iterations. Must be at least 1.");
+   
+      this.iterations = iterations;
+   }
+   
+   @Override
+   public void configure(Map<String, Object> config) throws TransformerConfigurationException
+   {
+      if (config.containsKey(PARAM_ITERATIONS))
+      {
+         Integer value = Transformer.getValue(config, PARAM_ITERATIONS, Integer.class);
+         setNumberOfIterations(value.intValue());
+      }
    }
 
    @Override
    public Map<String, Object> getConfiguration()
    {
-      HashMap<String, Object> params = new HashMap<String, Object>();
-      return params;
+      Map<String, Object> config = new HashMap<>();
+      config.put(PARAM_ITERATIONS, Integer.valueOf(iterations));
+
+      return config;
    }
+
 
    @Override
    public Callable<BinaryImage> create(TransformerContext ctx)
@@ -33,7 +54,13 @@ public class ExpansionTransformer implements Transformer
       final BinaryImage source = (BinaryImage)ctx.getValue(BINARY_IMAGE_PIN);
       
       return () -> {
-         return ExpansionOperator.expand(source);
+         BinaryImage image = source;
+         for (int i = 0; i < iterations; i++)
+         {
+            image = ExpansionOperator.expand(image);
+         }
+         
+         return image;
       };
    }
 }

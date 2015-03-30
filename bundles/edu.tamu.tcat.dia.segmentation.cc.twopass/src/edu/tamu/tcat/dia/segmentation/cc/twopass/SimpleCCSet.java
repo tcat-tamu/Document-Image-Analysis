@@ -2,8 +2,10 @@ package edu.tamu.tcat.dia.segmentation.cc.twopass;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectedComponent;
@@ -34,11 +36,19 @@ public class SimpleCCSet implements ConnectComponentSet
       return components.get(Integer.valueOf(label));
    }
    
+   @Override
+   public Set<ConnectedComponent> asSet()
+   {
+      return new HashSet<>(components.values());
+   }
+   
+   @Override
    public int getWidth()
    {
       return width;
    }
    
+   @Override
    public int getHeight()
    {
       return height;

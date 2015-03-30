@@ -6,10 +6,20 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: edu.tamu.tcat.analytics.datatrax,
  edu.tamu.tcat.analytics.image.integral,
- edu.tamu.tcat.dia.binarization
-Export-Package: edu.tamu.tcat.dia.morphological,
+ edu.tamu.tcat.analytics.image.region,
+ edu.tamu.tcat.dia.binarization,
+ edu.tamu.tcat.dia.binarization.sauvola,
+ edu.tamu.tcat.dia.segmentation.cc,
+ edu.tamu.tcat.dia.segmentation.cc.twopass
+Export-Package: edu.tamu.tcat.dia.adapters.opencv,
+ edu.tamu.tcat.dia.classifier.music.runlength,
+ edu.tamu.tcat.dia.morphological,
  edu.tamu.tcat.dia.morphological.opencv,
+ edu.tamu.tcat.dia.morphological.opencv.transformer,
+ edu.tamu.tcat.dia.morphological.opencv.util;x-internal:=true,
+ edu.tamu.tcat.dia.opencv.pageseg,
  edu.tamu.tcat.dia.segmentation.images.bloomberg,
+ edu.tamu.tcat.dia.segmentation.images.bloomberg.datatrax,
  org.opencv.core,
  org.opencv.imgproc
 Bundle-ClassPath: lib/opencv-249.jar,

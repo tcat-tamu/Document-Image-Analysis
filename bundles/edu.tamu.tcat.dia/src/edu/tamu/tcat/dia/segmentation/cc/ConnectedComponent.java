@@ -19,6 +19,9 @@ import edu.tamu.tcat.analytics.image.region.Point;
  */
 public interface ConnectedComponent
 {
+   // NOTE not really a connected component. More of an image mask. Could include merged 
+   //      features or features recognized through some other means.
+   
    /**
     * @return The bounding box of this connected component.
     */
@@ -31,6 +34,16 @@ public interface ConnectedComponent
     */
    Set<Point> getPoints();
 
+   /**
+    * @return The geometric center of the bounding box for this connected component.
+    */
+   Point getCenter();
+   
+   /**
+    * @return The center of mass for the points within this connected component.
+    */
+   Point getCentroid();
+   
    /**
     * @return The number of pixels contained within this connected component.
     */

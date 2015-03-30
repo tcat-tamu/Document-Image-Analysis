@@ -11,9 +11,13 @@ import edu.tamu.tcat.analytics.image.region.SimpleBoundingBox;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectedComponent;
 
 /**
- * Note that this class is not immutable 
+ * Note that this class is not immutable
+ * @deprecated This class will be converted to a CCBuilder and will no longer implement 
+ *       {@link ConnectedComponent}. Should be used accordingly.  
  */
-public class SimpleCC implements ConnectedComponent {
+@Deprecated 
+public class SimpleCC implements ConnectedComponent 
+{
 
 	// TODO make this immutable -- create a builder
 	private final Set<Point> points = new HashSet<>();
@@ -21,6 +25,10 @@ public class SimpleCC implements ConnectedComponent {
 	private int xMax = -1;
 	private int yMin = -1;
 	private int yMax = -1;
+	
+	private int xWeight = 0;
+	private int yWeight = 0;
+	
    private int sequence;
 
 	public SimpleCC() {
@@ -51,6 +59,19 @@ public class SimpleCC implements ConnectedComponent {
    }
 	
 	@Override
+	public Point getCenter()
+	{
+	   return new PointImpl((xMax - xMin) / 2, (yMax - yMin) / 2);
+	}
+	
+	@Override
+	public Point getCentroid()
+	{
+	   int sz = points.size();
+	   return new PointImpl(xWeight / sz, yWeight / sz);
+	}
+	
+	@Override
 	public boolean intersects(ConnectedComponent cc)
 	{
 	   if (!BoxUtils.intersects(getBounds(), cc.getBounds()))
@@ -59,6 +80,11 @@ public class SimpleCC implements ConnectedComponent {
 	   return (cc instanceof SimpleCC) 
 	         ? intersectsInternal((SimpleCC)cc) 
             : intersectsGeneral(cc);
+	}
+	
+	public ConnectedComponent build()
+	{
+	   return new ImutableCC(sequence, getBounds(), points, getCentroid());
 	}
 	
 	private boolean intersectsGeneral(ConnectedComponent cc)
@@ -88,6 +114,8 @@ public class SimpleCC implements ConnectedComponent {
 		if (yMax < 0 || yMax < y)
 			yMax = y;
 
+		xWeight += x;
+		yWeight += y;
 		points.add(new PointImpl(x, y));
 	}
 	
@@ -96,6 +124,22 @@ public class SimpleCC implements ConnectedComponent {
 	   this.sequence = i;
 	}
 	
+	@Override
+	public int hashCode()
+	{
+	   // HACK: assumes all sequences in same image.
+	   return Integer.hashCode(sequence);
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+	   if (obj instanceof SimpleCC)
+	      return sequence == ((SimpleCC)obj).sequence;
+	   
+	   return false;
+	}
+	@Deprecated // use simple point
 	private static class PointImpl implements Point 
 	{
 	   private final int y;

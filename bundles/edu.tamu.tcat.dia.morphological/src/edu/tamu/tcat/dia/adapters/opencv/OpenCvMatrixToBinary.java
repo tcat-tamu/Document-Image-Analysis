@@ -11,11 +11,10 @@ import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.binarization.BooleanArrayBinaryImage;
-import edu.tamu.tcat.dia.morphological.OpenCvMatrix;
+import edu.tamu.tcat.dia.morphological.opencv.OpenCvMatrix;
 
 public class OpenCvMatrixToBinary implements Transformer
 {
-
    public final static String EXTENSION_ID = "tcat.dia.adapters.opencv.matrix2binary"; 
    public static final String IMAGE_MATRIX_PIN = "image_matrix";
 
@@ -35,7 +34,7 @@ public class OpenCvMatrixToBinary implements Transformer
       return new HashMap<>();
    }
    
-   private BinaryImage adapt(Mat srcMat)
+   public static BinaryImage adapt(Mat srcMat)
    {
       int srcSize = srcMat.cols() * srcMat.rows();
       BooleanArrayBinaryImage output = new BooleanArrayBinaryImage(srcMat.cols(), srcMat.rows());

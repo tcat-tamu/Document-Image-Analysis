@@ -1,6 +1,7 @@
 package edu.tamu.tcat.dia.binarization.datatrax;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +11,7 @@ import edu.tamu.tcat.analytics.datatrax.Transformer;
 import edu.tamu.tcat.analytics.datatrax.TransformerConfigurationException;
 import edu.tamu.tcat.analytics.datatrax.TransformerContext;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
-import edu.tamu.tcat.dia.datatrax.ImageWriterUtils;
+import edu.tamu.tcat.dia.binarization.ImageWriterUtils;
 
 /**
  * Pass through data transformer that writes {@link BinaryImage}s to a file while passing 
@@ -34,12 +35,26 @@ public class BinaryImageWriter implements Transformer
 
    public void setPath(Path path) throws TransformerConfigurationException
    {
-      this.path = ImageWriterUtils.processOutputImagePath(path);
+      try
+      {
+         this.path = ImageWriterUtils.processOutputImagePath(path);
+      }
+      catch (IOException e)
+      {
+         throw new TransformerConfigurationException(e);
+      }
    }
    
    public void setFormat(String format) throws TransformerConfigurationException
    {
-      this.format = ImageWriterUtils.checkFormat(format);
+      try
+      {
+         this.format = ImageWriterUtils.checkFormat(format);
+      }
+      catch (IOException e)
+      {
+         throw new TransformerConfigurationException(e);
+      }
    }
 
    public void setModel(BufferedImage model)
@@ -50,8 +65,15 @@ public class BinaryImageWriter implements Transformer
    @Override
    public void configure(Map<String, Object> data) throws TransformerConfigurationException
    {
-      this.path = ImageWriterUtils.processOutputImagePath((Path)data.get("path"));
-      this.format = ImageWriterUtils.checkFormat((String)data.get("format"));
+      try
+      {
+         this.path = ImageWriterUtils.processOutputImagePath((Path)data.get("path"));
+         this.format = ImageWriterUtils.checkFormat((String)data.get("format"));
+      }
+      catch (IOException e)
+      {
+         throw new TransformerConfigurationException(e);
+      }
       
       Object model = data.get("model");
       if (model instanceof BufferedImage)

@@ -1,6 +1,7 @@
 package edu.tamu.tcat.dia.segmentation.cc;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Represents a set of connected components extracted from a common source such as a page
@@ -20,6 +21,11 @@ public interface ConnectComponentSet extends Iterable<ConnectedComponent>
     * @return The identified connected component
     */
    ConnectedComponent get(int label);
+   
+   /**
+    * @return The components as a {@link Set}.
+    */
+   Set<ConnectedComponent> asSet();
    
    /**
     * @return The width of the source image this connected component set is rendered on.

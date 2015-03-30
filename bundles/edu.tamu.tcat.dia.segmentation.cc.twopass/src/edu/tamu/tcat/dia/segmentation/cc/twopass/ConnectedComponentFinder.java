@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 import edu.tamu.tcat.dia.binarization.BinaryImage;
 import edu.tamu.tcat.dia.segmentation.cc.ConnectComponentSet;
 
-public class Finder implements Callable<ConnectComponentSet>
+public class ConnectedComponentFinder implements Callable<ConnectComponentSet>
 {
    
    private final int maxLabels;
@@ -21,7 +21,7 @@ public class Finder implements Callable<ConnectComponentSet>
    private UnionFind uf;
 
 
-   public Finder(BinaryImage image, int maxLabels) {
+   public ConnectedComponentFinder(BinaryImage image, int maxLabels) {
       this.image = image;
       this.maxLabels = maxLabels;
    }
