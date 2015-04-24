@@ -20,21 +20,16 @@ public class OpenCvClosingTransformer extends KernelBasedTransformer
    @Override
    public Callable<OpenCvMatrix> create(TransformerContext ctx)
    {
-      final OpenCvMatrix input = (OpenCvMatrix)ctx.getValue(IMAGE_MATRIX_PIN);
-      return new Callable<OpenCvMatrix>()
-      {
-         @Override
-         public OpenCvMatrix call() throws Exception
-         {
-            try (OpenCvMatrix kernel = getKernel())
-            {
-               Mat mat = input.get();
-               Mat dest = new Mat(mat.rows(), mat.cols(), mat.type());
-               Imgproc.erode(mat, dest, kernel.get());
+      return () -> {
+    	  OpenCvMatrix input = (OpenCvMatrix)ctx.getValue(IMAGE_MATRIX_PIN);
+    	  try (OpenCvMatrix kernel = getKernel())
+    	  {
+    		  Mat mat = input.get();
+    		  Mat dest = new Mat(mat.rows(), mat.cols(), mat.type());
+    		  Imgproc.erode(mat, dest, kernel.get());
 
-               return new OpenCvMatrix(dest);
-            }
-         }
+    		  return new OpenCvMatrix(dest);
+    	  }
       };
    }
 }

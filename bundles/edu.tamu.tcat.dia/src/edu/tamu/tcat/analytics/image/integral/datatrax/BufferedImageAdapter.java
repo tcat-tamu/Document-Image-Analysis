@@ -65,15 +65,9 @@ public class BufferedImageAdapter implements Transformer
    @Override
    public Callable<IntegralImage> create(TransformerContext ctx)
    {
-      final BufferedImage image = (BufferedImage)ctx.getValue("image");
-      return new Callable<IntegralImage>()
-      {
-
-         @Override
-         public IntegralImage call() throws Exception
-         {
-            return adapt(image);
-         }
+      return () -> {
+    	  BufferedImage image = (BufferedImage)ctx.getValue("image");
+    	  return adapt(image);
       };
    }
 }

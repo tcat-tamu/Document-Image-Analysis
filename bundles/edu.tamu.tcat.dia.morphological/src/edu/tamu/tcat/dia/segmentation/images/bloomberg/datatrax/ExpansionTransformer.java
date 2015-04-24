@@ -51,10 +51,8 @@ public class ExpansionTransformer implements Transformer
    @Override
    public Callable<BinaryImage> create(TransformerContext ctx)
    {
-      final BinaryImage source = (BinaryImage)ctx.getValue(BINARY_IMAGE_PIN);
-      
       return () -> {
-         BinaryImage image = source;
+    	 BinaryImage image = (BinaryImage)ctx.getValue(BINARY_IMAGE_PIN);
          for (int i = 0; i < iterations; i++)
          {
             image = ExpansionOperator.expand(image);
