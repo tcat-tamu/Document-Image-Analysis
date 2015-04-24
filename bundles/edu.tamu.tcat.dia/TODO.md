@@ -8,7 +8,8 @@ about useful algorithms and research literature for DIA.
 * **Docstrum**
 * **Integral Images**  
 Faisal Shafait; Daniel Keysers; Thomas M. Breuel; [Efficient implementation of local adaptive thresholding techniques using integral images](http://proceedings.spiedigitallibrary.org/proceeding.aspx?articleid=812244). Proc. SPIE 6815, Document Recognition and Retrieval XV, 681510 (January 28, 2008); doi:10.1117/12.767755.
-  
+* **Migrate datatrax to separate bundle**
+
 
 ##Segmentations
 

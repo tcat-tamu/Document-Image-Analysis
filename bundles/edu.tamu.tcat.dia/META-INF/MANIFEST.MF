@@ -15,4 +15,7 @@ Export-Package: edu.tamu.tcat.analytics.image.integral,
  edu.tamu.tcat.dia.binarization.sauvola,
  edu.tamu.tcat.dia.segmentation.cc,
  edu.tamu.tcat.dia.segmentation.cc.twopass
-Import-Package: edu.tamu.tcat.analytics.datatrax
+Import-Package: com.google.common.primitives,
+ edu.tamu.tcat.analytics.datatrax,
+ org.apache.commons.math3.fitting,
+ org.apache.commons.math3.optimization.fitting
