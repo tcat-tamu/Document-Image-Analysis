@@ -108,25 +108,21 @@ public class FastSauvolaTransformer implements Transformer
    @Override
    public Callable<BinaryImage> create(TransformerContext ctx)
    {
-      final IntegralImage intImage = (IntegralImage)ctx.getValue(INTEGRAL_IMAGE_PIN);
-      final BufferedImage bufImage = (BufferedImage)ctx.getValue(BUFFERED_IMAGE_PIN);
-      
-      if (intImage == null && bufImage == null)
-         throw new IllegalStateException("No input image supplied");
-      
-      return new Callable<BinaryImage>()
+      return () -> 
       {
-         @Override
-         public BinaryImage call() throws Exception
-         {
-            IntegralImage image = (intImage != null) 
-                  ? intImage : IntegralImageImpl.create(bufImage.getData());
-            
-            int window = (windowSize > 0) ? windowSize : image.getWidth() / 15;
-            
-            FastSauvolaBinarizer binarizer = new FastSauvolaBinarizer(image, window, k);
-            return binarizer.run();
-         }
+         IntegralImage intImage = (IntegralImage)ctx.getValue(INTEGRAL_IMAGE_PIN);
+         BufferedImage bufImage = (BufferedImage)ctx.getValue(BUFFERED_IMAGE_PIN);
+         
+         if (intImage == null && bufImage == null)
+            throw new IllegalStateException("No input image supplied");
+
+         IntegralImage image = (intImage != null) 
+               ? intImage : IntegralImageImpl.create(bufImage.getData());
+
+         int window = (windowSize > 0) ? windowSize : image.getWidth() / 15;
+
+         FastSauvolaBinarizer binarizer = new FastSauvolaBinarizer(image, window, k);
+         return binarizer.run();
       };
    }
 }
